@@ -1,6 +1,6 @@
 # 🛡️ Linux-Defender.sh
 
-**Author:** [CYBER-MRINAL](https://github.com/CYBER-MRINAL)  
+**Author:** [CYBER-4RMY](https://github.com/CYBER-4RMY)  
 **Purpose:** Harden your Linux system with one script — efficient, practical, and secure.  
 
 ---
@@ -49,7 +49,7 @@ It automates the installation and configuration of key security tools across pop
 ## ⚙️ Installation
 
 ```bash
-git clone https://github.com/CYBER-MRINAL/LINUX-DEFENDER.git
+git clone https://github.com/CYBER-4RMY/LINUX-DEFENDER.git
 cd Linux-Defender
 chmod +x setup.py
 ./setup.py
@@ -82,7 +82,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## 🙋‍♂️ Author
 
-Built with care and cybersecurity principles by [CYBER-MRINAL](https://github.com/CYBER-MRINAL)
+Built with care and cybersecurity principles by [CYBER-4RMY](https://github.com/CYBER-4RMY)
 *“Secure it before someone else exploits it.”*
 
 ---
@@ -90,4 +90,4 @@ Built with care and cybersecurity principles by [CYBER-MRINAL](https://github.co
 ## ☕ Support & Contribution
 
 For major changes, open an issue first to discuss what you would like to change.
-If this project helps secure your systems, consider giving it a ⭐ on GitHub and for more queries chat with me [TELEGRAM](https://t.me/cybermrinalgroup)
+If this project helps secure your systems, consider giving it a ⭐ on GitHub.
