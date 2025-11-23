@@ -1,8 +1,6 @@
 #!/bin/bash
 
-#GITHUB => 'https://github.com/CYBER-MRINAL'
-#TELEGRAM => 'https://t.me/CYBERMRINAL'
-#INSTAGRAM => 'https://instagram.com/CYBERMRINAL'
+#GITHUB => 'https://github.com/CYBER-4RMY'
 #FOR any type of issue or any new suggestion give me a dm on TELEGRAM or INSTAGRAM
 #also YOU can use GITHUB
 #Feel free to send new suggetion and security tools to include in this script
@@ -56,7 +54,7 @@ display_welcome() {
     echo "                       <<===============================>>"
     echo "                         <<-WELCOME-TO-LINUX-DEFENDER->>"
     echo "                       <<===============================>>"
-    echo "                             <<-=-CYBER-MRINAL-=->>       "
+    echo "                             <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -66,7 +64,7 @@ display_ufw_welcome() {
     echo "                       <<============================>>"
     echo "                         <<-WELCOME-TO-UFW-MANAGER->>"
     echo "                       <<============================>>"
-    echo "                            <<-=-CYBER-MRINAL-=->>       "
+    echo "                            <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -76,7 +74,7 @@ display_supdate_welcome() {
     echo "                       <<============================>>"
     echo "                         <<-WELCOME-TO-SYS-UPDATER->>"
     echo "                       <<============================>>"
-    echo "                            <<-=-CYBER-MRINAL-=->>       "
+    echo "                            <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -86,7 +84,7 @@ display_scan_welcome() {
     echo "                       <<=============================>>"
     echo "                         <<-WELCOME-TO-SCAN-MANAGER->>"
     echo "                       <<=============================>>"
-    echo "                            <<-=-CYBER-MRINAL-=->>       "
+    echo "                            <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -96,7 +94,7 @@ display_ai_welcome() {
     echo "                       <<========================================>>"
     echo "                         <<-WELCOME-TO-ARTIFICIAL-INTELLIGENCE->>"
     echo "                       <<========================================>>"
-    echo "                                   <<-=-CYBER-MRINAL-=->>       "
+    echo "                                   <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -106,7 +104,7 @@ display_traffic_welcome() {
     echo "                       <<========================================>>"
     echo "                         <<-WELCOME-TO-NETWORK-PIRVACY-MANAGER->>"
     echo "                       <<========================================>>"
-    echo "                                   <<-=-CYBER-MRINAL-=->>       "
+    echo "                                   <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -116,7 +114,7 @@ display_backup_welcome() {
     echo "                       <<===============================>>"
     echo "                         <<-WELCOME-TO-BACKUP-MANAGER->>"
     echo "                       <<===============================>>"
-    echo "                             <<-=-CYBER-MRINAL-=->>       "
+    echo "                             <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -126,7 +124,7 @@ display_css_welcome() {
     echo "                       <<===================================>>"
     echo "                         <<-WELCOME-TO-SYS-STATUS-MANAGER->>"
     echo "                       <<===================================>>"
-    echo "                                <<-=-CYBER-MRINAL-=->>       "
+    echo "                                <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -136,7 +134,7 @@ display_cfi_welcome() {
     echo "                       <<=============================================>>"
     echo "                         <<-WELCOME-TO-CHECK-FILE-INTEGRITY-MANAGER->>"
     echo "                       <<=============================================>>"
-    echo "                                     <<-=-CYBER-MRINAL-=->>       "
+    echo "                                     <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -146,7 +144,7 @@ display_report_welcome() {
     echo "                   <<==================>>---=====---<<=================>>"
     echo "                     <<-WELCOME-TO-LINUX-DEFENDER-REOPORT-GENERATOR->>"
     echo "                   <<==================>>---=====---<<=================>>"
-    echo "                                    <<-=-CYBER-MRINAL-=->>       "
+    echo "                                    <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -156,7 +154,7 @@ display_monitor_welcome() {
     echo "                       <<====================================>>"
     echo "                         <<-WELCOME-TO-SYS-MONITOR-SECTION->>"
     echo "                       <<====================================>>"
-    echo "                               <<-=-CYBER-MRINAL-=->>       "
+    echo "                               <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -169,8 +167,8 @@ display_banner1() {
     echo "                                             ╚════██║██╔══╝  ██║     ██║   ██║██╔══██╗██╔══╝╚════╝╚════██║  ╚██╔╝  ╚════██║"
     echo "                                             ███████║███████╗╚██████╗╚██████╔╝██║  ██║███████╗    ███████║   ██║   ███████║"
     echo "                                             ╚══════╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝    ╚══════╝   ╚═╝   ╚══════╝"
-    echo "                                             <<==========================>>{CYBER-MRINAL}<<==============================>>"
-    echo "                                                     <<==========={https://github.com/CYBER-MRINAL}===========>>"
+    echo "                                             <<==========================>>{CYBER-4RMY}<<==============================>>"
+    echo "                                                     <<==========={https://github.com/CYBER-4RMY}===========>>"
     echo "                                                             <<=======================================>> "
     echo -e "\033[0m"  # Reset color
 }
@@ -185,7 +183,7 @@ display_banner(){
     echo "                                ██║     ██║██║╚██╗██║██║   ██║ ██╔██╗╚════╝██║  ██║██╔══╝  ██╔══╝  ██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗"
     echo "                                ███████╗██║██║ ╚████║╚██████╔╝██╔╝ ██╗     ██████╔╝███████╗██║     ███████╗██║ ╚████║██████╔╝███████╗██║  ██║"
     echo "                                ╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝     ╚═════╝ ╚══════╝╚═╝     ╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝"
-    echo "                         <<))================================================={CYBER-MRINAL}====================================================((>>"
+    echo "                         <<))================================================={CYBER-4RMY}====================================================((>>"
     echo -e "\033[0m"
 }
 
@@ -734,7 +732,7 @@ update_system() {
 }
 
 update_from_github() {
-    local repo="CYBER-MRINAL/LINUX-DEFENDER"  # Exact GitHub repository (case-sensitive)
+    local repo="CYBER-4RMY/LINUX-DEFENDER"  # Exact GitHub repository (case-sensitive)
     local current_version="v1.2"               # Your current version (update as needed)
     local latest_version
     local zip_file
@@ -1331,7 +1329,7 @@ backup_files() {
                 echo -e "\033[1;32m" "\nBACKUP COMMAND (BACKC):"
                 echo " 1. custsf    - Custom Storage and Custom Folder"
                 echo "                                              "
-                echo "==>> IF any other backup idea you have then send me on (https://t.me/CYBERMRINAL)"
+                echo "==>> IF any other backup idea you have then send me on (https://t.me/CYBER4RMY)"
                 echo -e "\033[0m"  # Reset color
                 ;;
             "clear")
