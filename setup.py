@@ -47,7 +47,7 @@ def get_distro():
 
 def install_packages(distro):
     try:
-        if distro == "arch", "garuda":
+        if distro == ["arch", "garuda"]:
             run_cmd("sudo pacman -Syu --noconfirm")
             run_cmd("sudo pacman -S --noconfirm " + " ".join(arch_packages))
 
@@ -55,7 +55,7 @@ def install_packages(distro):
             run_cmd("sudo apt update && sudo apt upgrade -y")
             run_cmd("sudo apt install -y " + " ".join(debian_packages))
 
-            if distro == "kali", "ubuntu":
+            if distro == ["kali", "ubuntu"]:
                 print("[INFO] Installing kali-anonsurf...")
                 if not os.path.isdir("kali-anonsurf"):
                     run_cmd("git clone https://github.com/Und3rf10w/kali-anonsurf.git")
