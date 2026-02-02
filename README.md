@@ -61,14 +61,46 @@ It automates the installation and configuration of key security tools across pop
 
 ## ⚙️ Installation
 
+While the `setup.py` script provides an initial way to get started, for robust system integration, it is recommended to use the provided package formats for your distribution.
+
+### Building from Source (General)
+
 ```bash
 git clone https://github.com/CYBER-4RMY/LINUX-DEFENDER.git
 cd LINUX-DEFENDER
 chmod +x setup.py
 sudo ./setup.py
-````
+```
 
 If setup fails, the script will suggest exact commands for manual installation based on your OS. The `setup.py` script will install all necessary dependencies including: `auditd`, `audispd-plugins`, `logwatch`, `libpam-pwquality`, `libpam-google-authenticator`, `postfix`, `mailutils`, `curl`, `unzip`, `grep`, and `sort`.
+
+### 📦 Package Installation
+
+#### Debian (.deb) Package
+
+To install on Debian-based systems (Debian, Ubuntu, Kali, Parrot):
+
+1.  **Obtain the `.deb` package:**
+    The `.deb` file needs to be built on a Debian-based system. The necessary `debian/` packaging files are provided in this repository.
+    Once built, you will have a file named `linux-defender_1.3-1_all.deb` (or similar).
+    Example: `wget https://example.com/linux-defender_1.3-1_all.deb` (replace with actual download link or path)
+2.  **Install the package:**
+    `sudo dpkg -i linux-defender_1.3-1_all.deb`
+3.  **Resolve dependencies (if any issues):**
+    `sudo apt install -f`
+
+#### Arch Linux Package
+
+To install on Arch Linux:
+
+1.  **Ensure you have `git` and `base-devel` installed:**
+    `sudo pacman -S --needed git base-devel`
+2.  **Clone the repository:**
+    `git clone https://github.com/CYBER-4RMY/LINUX-DEFENDER.git`
+    `cd LINUX-DEFENDER`
+3.  **Build and install the package:**
+    `makepkg -si`
+    (This command will build the package, check for and install missing dependencies, and then install the package.)
 
 ---
 
@@ -78,10 +110,8 @@ Once dependencies are installed:
 
 (RUN THIS SCRIPT IN ROOT USER)
 ```bash
-chmod +x defender.sh
-sudo ./defender.sh
+sudo linux-defender
 ```
-
 This will initiate all hardening operations tailored for your Linux system. You can now use the `harden`, `audit`, `network`, `user`, `filesystem`, and `reporting` commands to access the new features.
 --- 
 

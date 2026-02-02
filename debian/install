@@ -1,0 +1,4 @@
+defender.sh /usr/local/bin/defender
+defender.conf /etc/linux-defender/
+LICENSE /usr/share/doc/linux-defender/
+README.md /usr/share/doc/linux-defender/

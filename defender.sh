@@ -8,7 +8,7 @@
 #to use. So feel free to send me.
 
 # --- CONFIGURATION ---
-CONFIG_FILE="defender.conf"
+CONFIG_FILE="/etc/linux-defender/defender.conf"
 
 # Default values
 LOGFILE="/var/log/linux_defender.log"

@@ -1,0 +1,27 @@
+post_install() {
+  echo ":: linux-defender has been installed."
+  echo ":: Configuration file is located at /etc/linux-defender/defender.conf"
+  echo ":: You can run the script using 'linux-defender'"
+}
+
+pre_upgrade() {
+  # Perform any pre-upgrade actions here
+  true
+}
+
+post_upgrade() {
+  echo ":: linux-defender has been upgraded."
+  echo ":: Configuration file is located at /etc/linux-defender/defender.conf"
+  echo ":: You can run the script using 'linux-defender'"
+}
+
+pre_remove() {
+  # Perform any pre-remove actions here
+  true
+}
+
+post_remove() {
+  echo ":: linux-defender has been removed."
+  # Optionally remove the config file on purge, but usually left for user
+  # rm -rf /etc/linux-defender
+}

@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+
+# dh_installdeb will replace this with shell code automatically
+# when the debian/postrm file is acted on by dh_installdeb.
+
+case "$1" in
+    purge) 
+        # Remove configuration directory if it's empty
+        if [ -d /etc/linux-defender ]; then
+            rmdir --ignore-fail-on-non-empty /etc/linux-defender || true
+        fi
+    ;; 
+
+    remove|upgrade|deconfigure)
+    ;; 
+
+    *) 
+        echo "postrm called with unknown argument \`$1'" >&2
+        exit 1
+    ;; 
+esac
+
+exit 0

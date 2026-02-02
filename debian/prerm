@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+# dh_installdeb will replace this with shell code automatically
+# when the debian/prerm file is acted on by dh_installdeb.
+
+case "$1" in
+    remove|upgrade|deconfigure)
+    ;;
+
+    *)
+        echo "prerm called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+exit 0

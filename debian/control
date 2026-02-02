@@ -1,0 +1,15 @@
+Source: linux-defender
+Section: utils
+Priority: optional
+Maintainer: CYBER-4RMY <root@localhost>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.0
+Homepage: https://github.com/CYBER-4RMY/LINUX-DEFENDER
+
+Package: linux-defender
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends},
+         tor, chkrootkit, clamav, auditd, iptables, ufw, inotify-tools, rkhunter, inxi, xterm, curl, unzip, grep, sort, audispd-plugins, logwatch, libpam-pwquality, libpam-google-authenticator, postfix, mailutils
+Description: Linux Defender - System Hardening Script
+ Harden your Linux system with one script — efficient, practical, and secure.
+ It automates the installation and configuration of key security tools across popular Linux distributions.

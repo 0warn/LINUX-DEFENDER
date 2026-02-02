@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+
+# dh_installdeb will replace this with shell code automatically
+# when the debian/postinst file is acted on by dh_installdeb.
+
+case "$1" in
+    configure)
+        # Ensure /etc/linux-defender directory exists
+        mkdir -p /etc/linux-defender
+        # Ensure the installed script is executable
+        chmod +x /usr/local/bin/defender
+    ;; 
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;; 
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;; 
+esac
+
+exit 0
