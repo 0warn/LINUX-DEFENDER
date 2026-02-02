@@ -21,6 +21,12 @@ It automates the installation and configuration of key security tools across pop
 - **AI Implemented** now i added tgpt for ai support and your query solution
 - ⚙️ Auto-detection of distro: Arch, Debian, Kali, Parrot
 - 💣 Fail-safe: gives manual package install instructions on failure
+- 🛡️ **System Hardening**: Kernel, SSH, and USB hardening options.
+- 📈 **Enhanced Auditing & Monitoring**: Integrate `auditd` rules and `logwatch` for comprehensive system surveillance.
+- 📡 **Advanced Network Security**: Detect port scans, mitigate SYN floods, and configure secure DNS.
+- 👤 **User & Access Control**: Enforce strong password policies, set up SSH 2FA, and check for risky user accounts.
+- 🗃️ **Filesystem & Malware Enhancements**: Make critical files immutable, schedule regular malware scans, and enable malware quarantine.
+- 📊 **Usability & Reporting**: Centralized configuration, interactive system check-ups, and email notifications.
 
 ---
 
@@ -30,6 +36,7 @@ It automates the installation and configuration of key security tools across pop
 - Kali Linux
 - Parrot OS
 - Debian
+- Ubuntu
 
 ---
 
@@ -39,10 +46,16 @@ It automates the installation and configuration of key security tools across pop
 |--------------------|--------------------------------------------------|
 | Firewall           | `ufw`, `iptables`                                |
 | Malware Protection | `chkrootkit`, `rkhunter`, `clamav`               |
-| Monitoring         | `audit` / `auditd`, `inotify-tools`, `inxi`      |
+| Monitoring         | `audit` / `auditd`, `inotify-tools`, `inxi`, `logwatch` |
 | Anonymity (Kali)   | `tor`, [`kali-anonsurf`](https://github.com/Und3rf10w/kali-anonsurf) |
 | Arch-only Tool     | `torctl`                                         |
 | AI                 | `TGPT`                                           |
+| Hardening          | `sysctl`, `modprobe`                             |
+| Network Security   | `iptables`, `sysctl`, `resolvconf`               |
+| User Management    | `pam`, `libpam-pwquality`, `libpam-google-authenticator` |
+| Filesystem         | `chattr`                                         |
+| Reporting          | `postfix`, `mailutils`                           |
+| Core Dependencies  | `curl`, `unzip`, `grep`, `sort`                  |
 
 ---
 
@@ -50,12 +63,12 @@ It automates the installation and configuration of key security tools across pop
 
 ```bash
 git clone https://github.com/CYBER-4RMY/LINUX-DEFENDER.git
-cd Linux-Defender
+cd LINUX-DEFENDER
 chmod +x setup.py
-./setup.py
+sudo ./setup.py
 ````
 
-If setup fails, the script will suggest exact commands for manual installation based on your OS.
+If setup fails, the script will suggest exact commands for manual installation based on your OS. The `setup.py` script will install all necessary dependencies including: `auditd`, `audispd-plugins`, `logwatch`, `libpam-pwquality`, `libpam-google-authenticator`, `postfix`, `mailutils`, `curl`, `unzip`, `grep`, and `sort`.
 
 ---
 
@@ -65,11 +78,11 @@ Once dependencies are installed:
 
 (RUN THIS SCRIPT IN ROOT USER)
 ```bash
-chmod +x Linux-Defender.sh
-sudo ./Linux-Defender.sh
+chmod +x defender.sh
+sudo ./defender.sh
 ```
 
-This will initiate all hardening operations tailored for your Linux system.
+This will initiate all hardening operations tailored for your Linux system. You can now use the `harden`, `audit`, `network`, `user`, `filesystem`, and `reporting` commands to access the new features.
 --- 
 
 ## 🧾 License

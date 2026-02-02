@@ -12,12 +12,14 @@ INSTALL_PATH = "/usr/local/bin"
 
 arch_packages = [
     "tor", "chkrootkit", "clamav", "audit", "iptables",
-    "ufw", "inotify-tools", "rkhunter", "inxi", "xterm"
+    "ufw", "inotify-tools", "rkhunter", "inxi", "xterm", "curl", "unzip", "grep", "sort",
+    "logwatch", "postfix", "mailutils", "google-authenticator"
 ]
 
 debian_packages = [
     "tor", "chkrootkit", "clamav", "auditd", "iptables",
-    "ufw", "inotify-tools", "rkhunter", "inxi", "xterm"
+    "ufw", "inotify-tools", "rkhunter", "inxi", "xterm", "curl", "unzip", "grep", "sort",
+    "audispd-plugins", "logwatch", "libpam-pwquality", "libpam-google-authenticator", "postfix", "mailutils"
 ]
 
 # ──────────────────────────────────────────────────────────────
@@ -95,6 +97,12 @@ def system_wide_install():
 
     src = os.path.abspath(SCRIPT_NAME)
     dst = os.path.join(INSTALL_PATH, INSTALL_NAME)
+
+    if os.path.exists(dst):
+        overwrite = input(f"'{dst}' already exists. Overwrite? [y/N]: ").strip().lower()
+        if overwrite != 'y':
+            print("[INFO] Installation aborted.")
+            return
 
     try:
         shutil.copy(src, dst)

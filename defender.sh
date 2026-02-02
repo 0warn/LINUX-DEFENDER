@@ -7,13 +7,37 @@
 #All time i am trying new tools for include in it and create linux more secure and easy
 #to use. So feel free to send me.
 
-# Configuration
+# --- CONFIGURATION ---
+CONFIG_FILE="defender.conf"
+
+# Default values
 LOGFILE="/var/log/linux_defender.log"
 SCAN_DIRS=("/home" "/etc" "/usr/bin" "/usr/sbin")
 BACKUP_DIR="/var/backups/linux_defender"
-CHECKSUM_FILE="/var/backups/checksums.sha256"
-SCRIPT_PATH="$(realpath "$0")"
-HISTORY_FILE="/var/.command_history"
+QUARANTINE_DIR="/var/quarantine"
+EMAIL_ADDRESS="root@localhost"
+
+# --- FUNCTIONS ---
+
+load_config() {
+    if [ -f "$CONFIG_FILE" ]; then
+        source "$CONFIG_FILE"
+    else
+        echo "Configuration file not found. Using default values."
+    fi
+}
+
+# ... (rest of the script)
+# Main function
+main() {
+    load_config
+    check_root
+    display_banner1
+    run_user_commands
+}
+
+# Run the main function
+main "$@"
 
 # Load history from file if it exists
 if [[ -f "$HISTORY_FILE" ]]; then
@@ -282,6 +306,36 @@ run_user_commands() {
                 monitor_files
                 current_section="HOME"
                 ;;
+            "cd harden")
+                current_section="HARDEN"
+                harden_system
+                current_section="HOME"
+                ;;
+            "cd audit")
+                current_section="AUDIT"
+                manage_audit
+                current_section="HOME"
+                ;;
+            "cd network")
+                current_section="NETWORK"
+                manage_network
+                current_section="HOME"
+                ;;
+            "cd user")
+                current_section="USER"
+                manage_user
+                current_section="HOME"
+                ;;
+            "cd filesystem")
+                current_section="FILESYSTEM"
+                manage_filesystem
+                current_section="HOME"
+                ;;
+            "cd reporting")
+                current_section="REPORTING"
+                manage_reporting
+                current_section="HOME"
+                ;;
             "banner")
                 display_banner
                 ;;
@@ -307,10 +361,22 @@ run_user_commands() {
                 echo " 9.  supdate  - Update the distribution "
                 echo " 10. tupdate  - Update to the latest veriosn of this tool."
                 echo " 11. monitor  - Monitor files and changes while testing something on system."
+                echo " 12. harden   - Harden your system with various security configurations."
+                echo " 13. audit    - Configure system auditing and monitoring."
+                echo " 14. network  - Configure advanced network security."
+                echo " 15. user     - Manage user and access control."
+                echo " 16. filesystem - Manage filesystem and malware enhancements."
+                echo " 17. reporting - Generate reports and configure notifications."
                 echo -e "\033[0m"
                 ;;
             *)
-                eval "$user_command"
+                if [[ -x "$(command -v "$user_command")" ]]; then
+                    "$user_command"
+                else
+                    echo -e "\033[1;31m"
+                    echo "-->> Invalid Command. Please use 'help' to see the commands."
+                    echo -e "\033[0m"
+                fi
                 ;;
         esac
 
@@ -319,7 +385,916 @@ run_user_commands() {
     done
 }
 
+# Function to display colorful welcome message for reporting
+display_reporting_welcome() {
+    echo -e "\033[1;32m"  # Green color
+    echo "                       <<===============================>>"
+    echo "                         <<-WELCOME-TO-REPORTING-MANAGER->>"
+    echo "                       <<===============================>>"
+    echo "                             <<-=-CYBER-4RMY-=->>       "
+    echo -e "\033[0m"  # Reset color
+}
+
+manage_reporting() {
+    local current_section="REPORTING"
+
+    while true; do
+        read -e -p " {LINUX-DEFENDER}-{${current_section}}-->> " option
+
+        if [[ "$option" == "exit" ]]; then
+            break
+        fi
+
+        if [[ -z "$option" ]]; then
+            continue
+        fi
+
+        history -s "$option"
+
+        case $option in
+            "checkup")
+                system_checkup
+                ;;
+            "email-notify-on")
+                configure_email_notifications "on"
+                ;;
+            "email-notify-off")
+                configure_email_notifications "off"
+                ;;
+            "help")
+                echo -e "\033[1;32m" "\nAVAILABLE COMMANDS (AC):"
+                echo " 1. ls              - List available reporting options"
+                echo " 2. cd ..           - Go back to the main menu"
+                echo " 3. clear           - Clear the terminal"
+                echo " 4. exit            - Exit the command interface"
+                echo " 5. banner          - Show the banner"
+                echo ""
+                echo -e "\033[1;31m"  # Red color
+                echo ">> By pressing CTRL+C the whole script stops (BE CAREFULL)"
+                echo -e "\033[0m"  # Reset color
+                ;;
+            "ls")
+                echo -e "\033[1;32m" "\nAVAILABLE REPORTING OPTIONS (ARO):"
+                echo " 1. checkup         - Run an interactive system security check-up"
+                echo " 2. email-notify-on - Enable email notifications for alerts"
+                echo " 3. email-notify-off- Disable email notifications for alerts"
+                echo -e "\033[0m"
+                ;;
+            "banner")
+                display_reporting_welcome
+                ;;
+            "clear")
+                clear
+                ;;
+            "cd ..")
+                return
+                ;;
+            *)
+                echo -e "\033[1;31m"
+                echo "-->> Invalid Command. Please use 'help' to see the commands."
+                echo -e "\033[0m"
+                ;;
+        esac
+        save_history
+    done
+}
+
+system_checkup() {
+    echo "Running system security check-up..."
+    local score=0
+    local max_score=3
+    local report_output=""
+
+    report_output+="--- System Security Check-up Report (${DATE}) ---\n"
+
+    # Check 1: Firewall Status
+    if sudo ufw status | grep -q "Status: active"; then
+        report_output+="[+] UFW Firewall: Active\n"
+        score=$((score + 1))
+    else
+        report_output+="[-] UFW Firewall: Inactive (Consider enabling UFW)\n"
+    fi
+
+    # Check 2: SSH Hardening (basic checks)
+    if grep -q "PermitRootLogin no" /etc/ssh/sshd_config && \
+       grep -q "PasswordAuthentication no" /etc/ssh/sshd_config; then
+        report_output+="[+] SSH Hardening: Basic measures applied (Root login disabled, Password auth disabled)\n"
+        score=$((score + 1))
+    else
+        report_output+="[-] SSH Hardening: Basic measures not fully applied (Review /etc/ssh/sshd_config)\n"
+    fi
+
+    # Check 3: World-writable files in sensitive directories
+    local ww_files=$(find /etc /usr/bin /usr/sbin -perm /o+w -type f 2>/dev/null)
+    if [[ -z "$ww_files" ]]; then
+        report_output+="[+] Sensitive Directories: No world-writable files found\n"
+        score=$((score + 1))
+    else
+        report_output+="[-] Sensitive Directories: World-writable files found. Review these files:\n"
+        while IFS= read -r line; do
+            report_output+="    - $line\n"
+        done <<< "$ww_files"
+    fi
+
+    local security_percentage=$(( (score * 100) / max_score ))
+    report_output+="\n--- Security Score: $score/$max_score ($security_percentage%) ---\n"
+    
+    echo -e "$report_output" | tee "$LOGFILE" # Output to console and log
+    log_message "INFO" "System security check-up completed."
+    send_alert "System security check-up completed. Score: $score/$max_score ($security_percentage%)"
+}
+
+configure_email_notifications() {
+    if [[ "$1" == "on" ]]; then
+        echo "Enabling email notifications..."
+        distro=$(get_distro)
+        if [[ "$distro" == "arch" ]]; then
+            sudo pacman -S --noconfirm postfix mailutils
+        else
+            sudo apt-get install -y postfix mailutils
+        fi
+        
+        sudo postconf -e "relayhost = " # Configure relayhost if needed
+        sudo systemctl enable postfix
+        sudo systemctl start postfix
+        log_message "INFO" "Email notifications enabled. Alerts will be sent to $EMAIL_ADDRESS."
+        send_alert "Email notifications have been enabled."
+    elif [[ "$1" == "off" ]]; then
+        echo "Disabling email notifications..."
+        sudo systemctl stop postfix
+        sudo systemctl disable postfix
+        log_message "INFO" "Email notifications disabled."
+        send_alert "Email notifications have been disabled."
+    fi
+}
+
+
+# Function to display colorful welcome message for filesystem
+display_filesystem_welcome() {
+    echo -e "\033[1;32m"  # Green color
+    echo "                       <<===============================>>"
+    echo "                         <<-WELCOME-TO-FILESYSTEM-MANAGER->>"
+    echo "                       <<===============================>>"
+    echo "                             <<-=-CYBER-4RMY-=->>       "
+    echo -e "\033[0m"  # Reset color
+}
+
+manage_filesystem() {
+    local current_section="FILESYSTEM"
+
+    while true; do
+        read -e -p " {LINUX-DEFENDER}-{${current_section}}-->> " option
+
+        if [[ "$option" == "exit" ]]; then
+            break
+        fi
+
+        if [[ -z "$option" ]]; then
+            continue
+        fi
+
+        history -s "$option"
+
+        case $option in
+            "immutable-on")
+                make_immutable "on"
+                ;;
+            "immutable-off")
+                make_immutable "off"
+                ;;
+            "schedule-scans")
+                schedule_scans
+                ;;
+            "quarantine-on")
+                configure_quarantine "on"
+                ;;
+            "quarantine-off")
+                configure_quarantine "off"
+                ;;
+            "help")
+                echo -e "\033[1;32m" "\nAVAILABLE COMMANDS (AC):"
+                echo " 1. ls              - List available filesystem options"
+                echo " 2. cd ..           - Go back to the main menu"
+                echo " 3. clear           - Clear the terminal"
+                echo " 4. exit            - Exit the command interface"
+                echo " 5. banner          - Show the banner"
+                echo ""
+                echo -e "\033[1;31m"  # Red color
+                echo ">> By pressing CTRL+C the whole script stops (BE CAREFULL)"
+                echo -e "\033[0m"  # Reset color
+                ;;
+            "ls")
+                echo -e "\033[1;32m" "\nAVAILABLE FILESYSTEM OPTIONS (AFO):"
+                echo " 1. immutable-on    - Make critical files immutable"
+                echo " 2. immutable-off   - Make critical files mutable"
+                echo " 3. schedule-scans  - Schedule regular malware scans"
+                echo " 4. quarantine-on   - Enable malware quarantine"
+                echo " 5. quarantine-off  - Disable malware quarantine"
+                echo -e "\033[0m"
+                ;;
+            "banner")
+                display_filesystem_welcome
+                ;;
+            "clear")
+                clear
+                ;;
+            "cd ..")
+                return
+                ;;
+            *)
+                echo -e "\033[1;31m"
+                echo "-->> Invalid Command. Please use 'help' to see the commands."
+                echo -e "\033[0m"
+                ;;
+        esac
+        save_history
+    done
+}
+
+make_immutable() {
+    if [[ "$1" == "on" ]]; then
+        echo "Making critical files immutable..."
+        sudo chattr +i /etc/passwd
+        sudo chattr +i /etc/shadow
+        sudo chattr +i /etc/group
+        log_message "INFO" "Critical files made immutable."
+        send_alert "Critical files have been made immutable."
+    elif [[ "$1" == "off" ]]; then
+        echo "Making critical files mutable..."
+        sudo chattr -i /etc/passwd
+        sudo chattr -i /etc/shadow
+        sudo chattr -i /etc/group
+        log_message "INFO" "Critical files made mutable."
+        send_alert "Critical files have been made mutable."
+    fi
+}
+
+schedule_scans() {
+    echo "Scheduling regular malware scans..."
+    echo "Enter scan frequency (e.g., daily, weekly, monthly):"
+    read -p "> " frequency
+    
+    case "$frequency" in
+        "daily")
+            cron_schedule="0 2 * * *" # Every day at 2 AM
+            ;;
+        "weekly")
+            cron_schedule="0 2 * * 0" # Every Sunday at 2 AM
+            ;;
+        "monthly")
+            cron_schedule="0 2 1 * *" # First day of every month at 2 AM
+            ;;
+        *)
+            echo "Invalid frequency. Defaulting to daily."
+            cron_schedule="0 2 * * *"
+            ;;
+    esac
+    
+    (crontab -l 2>/dev/null; echo "$cron_schedule sudo rkhunter --check --update >> $LOGFILE") | crontab -
+    (crontab -l 2>/dev/null; echo "$cron_schedule sudo chkrootkit >> $LOGFILE") | crontab -
+    (crontab -l 2>/dev/null; echo "$cron_schedule sudo clamscan -r / --move=$QUARANTINE_DIR >> $LOGFILE") | crontab -
+    
+    log_message "INFO" "Regular malware scans scheduled ($frequency)."
+    send_alert "Regular malware scans have been scheduled ($frequency)."
+}
+
+configure_quarantine() {
+    if [[ "$1" == "on" ]]; then
+        echo "Enabling malware quarantine..."
+        sudo mkdir -p "$QUARANTINE_DIR"
+        sudo chmod 700 "$QUARANTINE_DIR"
+        # No direct clamav configuration for quarantine, it's done via the clamscan command
+        log_message "INFO" "Malware quarantine enabled. Quarantined files will be moved to $QUARANTINE_DIR."
+        send_alert "Malware quarantine has been enabled."
+    elif [[ "$1" == "off" ]]; then
+        echo "Disabling malware quarantine..."
+        # This will remove the quarantine directory and any files within it.
+        # User confirmation might be good here in a real scenario.
+        sudo rm -rf "$QUARANTINE_DIR"
+        log_message "INFO" "Malware quarantine disabled. Quarantine directory removed."
+        send_alert "Malware quarantine has been disabled."
+    fi
+}
+
+
+# Function to display colorful welcome message for user
+display_user_welcome() {
+    echo -e "\033[1;32m"  # Green color
+    echo "                       <<===============================>>"
+    echo "                         <<-WELCOME-TO-USER-MANAGER->>"
+    echo "                       <<===============================>>"
+    echo "                             <<-=-CYBER-4RMY-=->>       "
+    echo -e "\033[0m"  # Reset color
+}
+
+manage_user() {
+    local current_section="USER"
+
+    while true; do
+        read -e -p " {LINUX-DEFENDER}-{${current_section}}-->> " option
+
+        if [[ "$option" == "exit" ]]; then
+            break
+        fi
+
+        if [[ -z "$option" ]]; then
+            continue
+        fi
+
+        history -s "$option"
+
+        case $option in
+            "password-policy")
+                enforce_password_policy
+                ;;
+            "2fa")
+                setup_2fa
+                ;;
+            "risky-users")
+                check_risky_users
+                ;;
+            "help")
+                echo -e "\033[1;32m" "\nAVAILABLE COMMANDS (AC):"
+                echo " 1. ls              - List available user options"
+                echo " 2. cd ..           - Go back to the main menu"
+                echo " 3. clear           - Clear the terminal"
+                echo " 4. exit            - Exit the command interface"
+                echo " 5. banner          - Show the banner"
+                echo ""
+                echo -e "\033[1;31m"  # Red color
+                echo ">> By pressing CTRL+C the whole script stops (BE CAREFULL)"
+                echo -e "\033[0m"  # Reset color
+                ;;
+            "ls")
+                echo -e "\033[1;32m" "\nAVAILABLE USER OPTIONS (AUO):"
+                echo " 1. password-policy - Enforce strong password policies"
+                echo " 2. 2fa             - Set up two-factor authentication for SSH"
+                echo " 3. risky-users     - Check for risky user accounts"
+                echo -e "\033[0m"
+                ;;
+            "banner")
+                display_user_welcome
+                ;;
+            "clear")
+                clear
+                ;;
+            "cd ..")
+                return
+                ;;
+            *)
+                echo -e "\033[1;31m"
+                echo "-->> Invalid Command. Please use 'help' to see the commands."
+                echo -e "\033[0m"
+                ;;
+        esac
+        save_history
+    done
+}
+
+enforce_password_policy() {
+    echo "Enforcing strong password policies..."
+    distro=$(get_distro)
+    if [[ "$distro" == "arch" ]]; then
+        sudo pacman -S --noconfirm pam
+    else
+        sudo apt-get install -y libpam-pwquality
+    fi
+    
+    sudo cp /etc/pam.d/common-password /etc/pam.d/common-password.bak
+    sudo tee -a /etc/pam.d/common-password > /dev/null <<'EOF'
+
+# Enforce strong password policies
+password requisite pam_pwquality.so retry=3 minlen=8 difok=3 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1
+EOF
+    log_message "INFO" "Strong password policies enforced."
+    send_alert "Strong password policies have been enforced."
+}
+
+setup_2fa() {
+    echo "Setting up two-factor authentication for SSH..."
+    distro=$(get_distro)
+    if [[ "$distro" == "arch" ]]; then
+        sudo pacman -S --noconfirm libpam-google-authenticator
+    else
+        sudo apt-get install -y libpam-google-authenticator
+    fi
+    
+    # Configure sshd
+    sudo cp /etc/pam.d/sshd /etc/pam.d/sshd.bak
+    sudo echo "auth required pam_google_authenticator.so" >> /etc/pam.d/sshd
+    
+    sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+    sudo sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config
+    
+    sudo systemctl restart sshd
+    
+    # Run google-authenticator for the current user
+    google-authenticator
+    
+    log_message "INFO" "Two-factor authentication for SSH set up."
+    send_alert "Two-factor authentication for SSH has been set up."
+    
+    echo "Please log out and log back in to complete the setup."
+}
+
+check_risky_users() {
+    echo "Checking for risky user accounts..."
+    
+    echo "--- Accounts with empty passwords ---"
+    sudo awk -F: '($2 == "") { print $1 }' /etc/shadow
+    
+    echo "--- Non-root accounts with UID 0 ---"
+    sudo awk -F: '($3 == 0 && $1 != "root") { print $1 }' /etc/passwd
+    
+    echo "--- Sudo users ---"
+    grep -Po '^sudo.+:\K.*$' /etc/group | sed 's/,/\n/g'
+    
+    log_message "INFO" "Risky user accounts checked."
+    send_alert "Risky user accounts have been checked."
+}
+
+
+# Function to display colorful welcome message for network
+display_network_welcome() {
+    echo -e "\033[1;32m"  # Green color
+    echo "                       <<===============================>>"
+    echo "                         <<-WELCOME-TO-NETWORK-MANAGER->>"
+    echo "                       <<===============================>>"
+    echo "                             <<-=-CYBER-4RMY-=->>       "
+    echo -e "\033[0m"  # Reset color
+}
+
+manage_network() {
+    local current_section="NETWORK"
+
+    while true; do
+        read -e -p " {LINUX-DEFENDER}-{${current_section}}-->> " option
+
+        if [[ "$option" == "exit" ]]; then
+            break
+        fi
+
+        if [[ -z "$option" ]]; then
+            continue
+        fi
+
+        history -s "$option"
+
+        case $option in
+            "psd-on")
+                detect_port_scans "on"
+                ;;
+            "psd-off")
+                detect_port_scans "off"
+                ;;
+            "syn-on")
+                mitigate_syn_floods "on"
+                ;;
+            "syn-off")
+                mitigate_syn_floods "off"
+                ;;
+            "dns-on")
+                configure_secure_dns "on"
+                ;;
+            "dns-off")
+                configure_secure_dns "off"
+                ;;
+            "help")
+                echo -e "\033[1;32m" "\nAVAILABLE COMMANDS (AC):"
+                echo " 1. ls        - List available network options"
+                echo " 2. cd ..     - Go back to the main menu"
+                echo " 3. clear     - Clear the terminal"
+                echo " 4. exit      - Exit the command interface"
+                echo " 5. banner    - Show the banner"
+                echo ""
+                echo -e "\033[1;31m"  # Red color
+                echo ">> By pressing CTRL+C the whole script stops (BE CAREFULL)"
+                echo -e "\033[0m"  # Reset color
+                ;;
+            "ls")
+                echo -e "\033[1;32m" "\nAVAILABLE NETWORK OPTIONS (ANO):"
+                echo " 1. psd-on    - Enable port scan detection"
+                echo " 2. psd-off   - Disable port scan detection"
+                echo " 3. syn-on    - Enable SYN flood mitigation"
+                echo " 4. syn-off   - Disable SYN flood mitigation"
+                echo " 5. dns-on    - Enable secure DNS"
+                echo " 6. dns-off   - Disable secure DNS"
+                echo -e "\033[0m"
+                ;;
+            "banner")
+                display_network_welcome
+                ;;
+            "clear")
+                clear
+                ;;
+            "cd ..")
+                return
+                ;;
+            *)
+                echo -e "\033[1;31m"
+                echo "-->> Invalid Command. Please use 'help' to see the commands."
+                echo -e "\033[0m"
+                ;;
+        esac
+        save_history
+    done
+}
+
+detect_port_scans() {
+    if [[ "$1" == "on" ]]; then
+        echo "Enabling port scan detection..."
+        sudo iptables -A INPUT -m recent --name portscan --rcheck --seconds 86400 -j DROP
+        sudo iptables -A FORWARD -m recent --name portscan --rcheck --seconds 86400 -j DROP
+        sudo iptables -A INPUT -m recent --name portscan --remove
+        sudo iptables -A FORWARD -m recent --name portscan --remove
+        sudo iptables -A INPUT -p tcp -m tcp --dport 139 -m recent --name portscan --set -j LOG --log-prefix "portscan:"
+        sudo iptables -A INPUT -p tcp -m tcp --dport 139 -m recent --name portscan --set -j DROP
+        sudo iptables -A FORWARD -p tcp -m tcp --dport 139 -m recent --name portscan --set -j LOG --log-prefix "portscan:"
+        sudo iptables -A FORWARD -p tcp -m tcp --dport 139 -m recent --name portscan --set -j DROP
+        log_message "INFO" "Port scan detection enabled."
+        send_alert "Port scan detection has been enabled."
+    elif [[ "$1" == "off" ]]; then
+        echo "Disabling port scan detection..."
+        sudo iptables -D INPUT -m recent --name portscan --rcheck --seconds 86400 -j DROP
+        sudo iptables -D FORWARD -m recent --name portscan --rcheck --seconds 86400 -j DROP
+        sudo iptables -D INPUT -m recent --name portscan --remove
+        sudo iptables -D FORWARD -m recent --name portscan --remove
+        sudo iptables -D INPUT -p tcp -m tcp --dport 139 -m recent --name portscan --set -j LOG --log-prefix "portscan:"
+        sudo iptables -D INPUT -p tcp -m tcp --dport 139 -m recent --name portscan --set -j DROP
+        sudo iptables -D FORWARD -p tcp -m tcp --dport 139 -m recent --name portscan --set -j LOG --log-prefix "portscan:"
+        sudo iptables -D FORWARD -p tcp -m tcp --dport 139 -m recent --name portscan --set -j DROP
+        log_message "INFO" "Port scan detection disabled."
+        send_alert "Port scan detection has been disabled."
+    fi
+}
+
+mitigate_syn_floods() {
+    if [[ "$1" == "on" ]]; then
+        echo "Enabling SYN flood mitigation..."
+        sudo sysctl -w net.ipv4.tcp_syncookies=1
+        sudo sysctl -w net.ipv4.tcp_max_syn_backlog=2048
+        sudo sysctl -w net.ipv4.tcp_synack_retries=2
+        sudo iptables -A INPUT -p tcp --syn -m limit --limit 1/s --limit-burst 3 -j RETURN
+        sudo iptables -A INPUT -p tcp --syn -j DROP
+        log_message "INFO" "SYN flood mitigation enabled."
+        send_alert "SYN flood mitigation has been enabled."
+    elif [[ "$1" == "off" ]]; then
+        echo "Disabling SYN flood mitigation..."
+        sudo sysctl -w net.ipv4.tcp_syncookies=0
+        sudo iptables -D INPUT -p tcp --syn -m limit --limit 1/s --limit-burst 3 -j RETURN
+        sudo iptables -D INPUT -p tcp --syn -j DROP
+        log_message "INFO" "SYN flood mitigation disabled."
+        send_alert "SYN flood mitigation has been disabled."
+    fi
+}
+
+configure_secure_dns() {
+    if [[ "$1" == "on" ]]; then
+        echo "Configuring secure DNS..."
+        sudo cp /etc/resolv.conf /etc/resolv.conf.bak
+        sudo tee /etc/resolv.conf > /dev/null <<'EOF'
+# Secure DNS servers provided by Cloudflare
+nameserver 1.1.1.1
+nameserver 1.0.0.1
+EOF
+        log_message "INFO" "Secure DNS configured."
+        send_alert "Secure DNS has been configured."
+    elif [[ "$1" == "off" ]]; then
+        echo "Disabling secure DNS..."
+        sudo mv /etc/resolv.conf.bak /etc/resolv.conf
+        log_message "INFO" "Secure DNS disabled."
+        send_alert "Secure DNS has been disabled."
+    fi
+}
+
+
+# Function to display colorful welcome message for audit
+display_audit_welcome() {
+    echo -e "\033[1;32m"  # Green color
+    echo "                       <<===============================>>"
+    echo "                         <<-WELCOME-TO-AUDIT-MANAGER->>"
+    echo "                       <<===============================>>"
+    echo "                             <<-=-CYBER-4RMY-=->>       "
+    echo -e "\033[0m"  # Reset color
+}
+
+manage_audit() {
+    local current_section="AUDIT"
+
+    while true; do
+        read -e -p " {LINUX-DEFENDER}-{${current_section}}-->> " option
+
+        if [[ "$option" == "exit" ]]; then
+            break
+        fi
+
+        if [[ -z "$option" ]]; then
+            continue
+        fi
+
+        history -s "$option"
+
+        case $option in
+            "install-auditd")
+                install_auditd
+                ;;
+            "config-auditd")
+                configure_audit_rules
+                ;;
+            "install-logwatch")
+                install_logwatch
+                ;;
+            "help")
+                echo -e "\033[1;32m" "\nAVAILABLE COMMANDS (AC):"
+                echo " 1. ls              - List available audit options"
+                echo " 2. cd ..           - Go back to the main menu"
+                echo " 3. clear           - Clear the terminal"
+                echo " 4. exit            - Exit the command interface"
+                echo " 5. banner          - Show the banner"
+                echo ""
+                echo -e "\033[1;31m"  # Red color
+                echo ">> By pressing CTRL+C the whole script stops (BE CAREFULL)"
+                echo -e "\033[0m"  # Reset color
+                ;;
+            "ls")
+                echo -e "\033[1;32m" "\nAVAILABLE AUDIT OPTIONS (AAO):"
+                echo " 1. install-auditd  - Install and enable auditd"
+                echo " 2. config-auditd   - Apply baseline auditd rules"
+                echo " 3. install-logwatch- Install and configure logwatch"
+                echo -e "\033[0m"
+                ;;
+            "banner")
+                display_audit_welcome
+                ;;
+            "clear")
+                clear
+                ;;
+            "cd ..")
+                return
+                ;;
+            *)
+                echo -e "\033[1;31m"
+                echo "-->> Invalid Command. Please use 'help' to see the commands."
+                echo -e "\033[0m"
+                ;;
+        esac
+        save_history
+    done
+}
+
+install_auditd() {
+    echo "Installing auditd..."
+    distro=$(get_distro)
+    if [[ "$distro" == "arch" ]]; then
+        sudo pacman -S --noconfirm audit
+    else
+        sudo apt-get install -y auditd audispd-plugins
+    fi
+    sudo systemctl enable auditd
+    sudo systemctl start auditd
+    log_message "INFO" "auditd installed and enabled."
+    send_alert "auditd has been installed and enabled."
+}
+
+configure_audit_rules() {
+    echo "Configuring auditd rules..."
+    sudo cp /etc/audit/rules.d/audit.rules /etc/audit/rules.d/audit.rules.bak
+    sudo tee /etc/audit/rules.d/audit.rules > /dev/null <<'EOF'
+# This file is automatically generated by Linux Defender
+
+# Remove any existing rules
+-D
+
+# Increase the buffers to survive a burst of events
+-b 8192
+
+# Failure mode: 1=panic, 2=halt
+-f 1
+
+## Watch sensitive files
+-w /etc/passwd -p wa -k passwd_changes
+-w /etc/shadow -p wa -k shadow_changes
+-w /etc/group -p wa -k group_changes
+-w /etc/sudoers -p wa -k sudoers_changes
+
+## Watch for privileged command execution
+-a always,exit -F arch=b64 -S execve -C uid!=euid -F euid=0 -k setuid_exec
+-a always,exit -F arch=b32 -S execve -C uid!=euid -F euid=0 -k setuid_exec
+-a always,exit -F arch=b64 -S execve -C gid!=egid -F egid=0 -k setgid_exec
+-a always,exit -F arch=b32 -S execve -C gid!=egid -F egid=0 -k setgid_exec
+
+## Watch for module loading/unloading
+-w /sbin/insmod -p x -k module_load
+-w /sbin/rmmod -p x -k module_unload
+-w /sbin/modprobe -p x -k module_probe
+
+## Watch for changes to network configuration
+-w /etc/issue -p wa -k issue_change
+-w /etc/issue.net -p wa -k issue_net_change
+-w /etc/hosts -p wa -k hosts_change
+-w /etc/network/interfaces -p wa -k network_interfaces_change
+
+# Make the configuration immutable
+-e 2
+EOF
+    sudo systemctl restart auditd
+    log_message "INFO" "auditd rules configured."
+    send_alert "auditd rules have been configured."
+}
+
+install_logwatch() {
+    echo "Installing logwatch..."
+    distro=$(get_distro)
+    if [[ "$distro" == "arch" ]]; then
+        sudo pacman -S --noconfirm logwatch
+    else
+        sudo apt-get install -y logwatch
+    fi
+    
+    # Create a default configuration file
+    sudo tee /etc/logwatch/conf/logwatch.conf > /dev/null <<'EOF'
+# Default configuration file for Logwatch
+
+# Mail settings
+MailTo = root
+MailFrom = Logwatch
+
+# Report settings
+Range = yesterday
+Detail = Low
+Service = All
+Service = "-zz-network"     # Be quiet about network connections
+Service = "-zz-sys"         # Be quiet about system startups
+Service = "-zz-misc"        # Be quiet about miscellaneous items
+Service = "-exim-summary"   # Be quiet about exim summary
+Service = "-http"           # Be quiet about http
+Service = "-identd"         # Be quiet about identd
+Service = "-sendmail"       # Be quiet about sendmail
+Service = "-sudo"           # Be quiet about sudo
+Service = "-cron"           # Be quiet about cron
+Service = "-sshd"           # Be quiet about sshd
+Service = "-named"          # Be quiet about named
+Service = "-postfix"        # Be quiet about postfix
+Service = "-dovecot"        # Be quiet about dovecot
+
+# Log file to use
+LogFile = /var/log/messages
+LogFile = /var/log/syslog
+LogFile = /var/log/auth.log
+LogFile = /var/log/secure
+
+# Temporary directory
+TmpDir = /var/cache/logwatch
+
+EOF
+    
+    log_message "INFO" "logwatch installed and configured."
+    send_alert "logwatch has been installed and configured."
+}
+
+
+# Function to display colorful welcome message for harden
+display_harden_welcome() {
+    echo -e "\033[1;32m"  # Green color
+    echo "                       <<===============================>>"
+    echo "                         <<-WELCOME-TO-HARDEN-MANAGER->>"
+    echo "                       <<===============================>>"
+    echo "                             <<-=-CYBER-4RMY-=->>       "
+    echo -e "\033[0m"  # Reset color
+}
+
+harden_system() {
+    local current_section="HARDEN"
+
+    while true; do
+        read -e -p " {LINUX-DEFENDER}-{${current_section}}-->> " option
+
+        if [[ "$option" == "exit" ]]; then
+            break
+        fi
+
+        if [[ -z "$option" ]]; then
+            continue
+        fi
+
+        history -s "$option"
+
+        case $option in
+            "ssh")
+                harden_ssh
+                ;;
+            "kernel")
+                harden_kernel
+                ;;
+            "usb-off")
+                disable_usb "on"
+                ;;
+            "usb-on")
+                disable_usb "off"
+                ;;
+            "help")
+                echo -e "\033[1;32m" "\nAVAILABLE COMMANDS (AC):"
+                echo " 1. ls        - List available hardening options"
+                echo " 2. cd ..     - Go back to the main menu"
+                echo " 3. clear     - Clear the terminal"
+                echo " 4. exit      - Exit the command interface"
+                echo " 5. banner    - Show the banner"
+                echo ""
+                echo -e "\033[1;31m"  # Red color
+                echo ">> By pressing CTRL+C the whole script stops (BE CAREFULL)"
+                echo -e "\033[0m"  # Reset color
+                ;;
+            "ls")
+                echo -e "\033[1;32m" "\nAVAILABLE HARDENING OPTIONS (AHO):"
+                echo " 1. ssh       - Harden SSH configuration"
+                echo " 2. kernel    - Apply kernel hardening settings"
+                echo " 3. usb-off   - Disable USB storage"
+                echo " 4. usb-on    - Enable USB storage"
+                echo -e "\033[0m"
+                ;;
+            "banner")
+                display_harden_welcome
+                ;;
+            "clear")
+                clear
+                ;;
+            "cd ..")
+                return
+                ;;
+            *)
+                echo -e "\033[1;31m"
+                echo "-->> Invalid Command. Please use 'help' to see the commands."
+                echo -e "\033[0m"
+                ;;
+        esac
+        save_history
+    done
+}
+
+harden_ssh() {
+    echo "Hardening SSH..."
+    # Backup sshd_config
+    sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+    
+    # Disable root login
+    sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin no/' /etc/ssh/sshd_config
+    sudo sed -i 's/PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
+    
+    # Change port
+    # sudo sed -i 's/#Port 22/Port 2222/' /etc/ssh/sshd_config
+    
+    # Disable password authentication
+    sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+    
+    sudo systemctl restart sshd
+    log_message "INFO" "SSH hardening applied."
+    send_alert "SSH configuration has been hardened."
+}
+
+harden_kernel() {
+    echo "Hardening kernel..."
+    
+    # Enable ASLR
+    sudo echo "kernel.randomize_va_space = 2" > /etc/sysctl.d/99-hardening.conf
+    
+    # Hide kernel symbols
+    sudo echo "kernel.kptr_restrict = 2" >> /etc/sysctl.d/99-hardening.conf
+    
+    # Apply settings
+    sudo sysctl -p /etc/sysctl.d/99-hardening.conf
+    
+    log_message "INFO" "Kernel hardening applied."
+    send_alert "Kernel parameters have been hardened."
+}
+
+disable_usb() {
+    if [[ "$1" == "on" ]]; then
+        echo "Disabling USB storage..."
+        echo 'install usb-storage /bin/true' > /etc/modprobe.d/disable-usb-storage.conf
+        log_message "INFO" "USB storage disabled."
+        send_alert "USB storage has been disabled."
+    elif [[ "$1" == "off" ]]; then
+        echo "Enabling USB storage..."
+        rm /etc/modprobe.d/disable-usb-storage.conf
+        log_message "INFO" "USB storage enabled."
+        send_alert "USB storage has been enabled."
+    fi
+}
+
+
 # Function to manage UFW firewall rules
+ufw_rule() {
+    local action=$1
+    local rule=$2
+    echo -e "\033[1;32m"
+    echo "<<==={UFW-${action^^}-${rule^^}}===>>"
+    echo -e "\033[0m"
+    sudo ufw "$action" "$rule"
+    log_message "INFO" "UFW ${action}d $rule."
+    send_alert "UFW ${action}d $rule."
+}
+
 manage_firewall() {
     local current_section="UFW"
 
@@ -347,68 +1322,28 @@ manage_firewall() {
 
         case $option in
             "enable")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ON}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw enable
-                log_message "INFO" "UFW enabled."
-                send_alert "UFW has been enabled."
+                ufw_rule "enable"
                 ;;
             "disable")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-OFF}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw disable
-                log_message "INFO" "UFW disabled."
-                send_alert "UFW has been disabled."
+                ufw_rule "disable"
                 ;;
             "assh")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ALLOW-SSH}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow ssh
-                log_message "INFO" "SSH allowed through UFW."
-                send_alert "SSH has been allowed through UFW."
+                ufw_rule "allow" "ssh"
                 ;;
             "dssh")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-SSH}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw deny ssh
-                log_message "INFO" "SSH denied through UFW."
-                send_alert "SSH has been denied through UFW."
+                ufw_rule "deny" "ssh"
                 ;;
             "ahttp")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ALLOW-HTTP}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow http
-                log_message "INFO" "HTTP allowed through UFW."
-                send_alert "HTTP has been allowed through UFW."
+                ufw_rule "allow" "http"
                 ;;
             "dhttp")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-HTTP}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw deny http
-                log_message "INFO" "HTTP denied through UFW."
-                send_alert "HTTP has been denied through UFW."
+                ufw_rule "deny" "http"
                 ;;
             "ahttps")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ALLOW-HTTPS}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow https
-                log_message "INFO" "HTTPS allowed through UFW."
-                send_alert "HTTPS has been allowed through UFW."
+                ufw_rule "allow" "https"
                 ;;
             "dhttps")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-HTTPS}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw deny https
-                log_message "INFO" "HTTPS denied through UFW."
-                send_alert "HTTPS has been denied through UFW."
+                ufw_rule "deny" "https"
                 ;;
             "statv")
                 echo -e "\033[1;32m"
@@ -435,132 +1370,52 @@ manage_firewall() {
                 sudo ufw reload
                 ;;
             "aftp")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ALLOW-FTP}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow ftp
-                log_message "INFO" "FTP allowed through UFW."
-                send_alert "FTP has been allowed through UFW."
+                ufw_rule "allow" "ftp"
                 ;;
             "dftp")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-FTP}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow ftp
-                log_message "INFO" "FTP denied through UFW."
-                send_alert "FTP has been denied through UFW."
+                ufw_rule "deny" "ftp"
                 ;;
             "deny-all")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-ALL}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw default deny
-                log_message "INFO" "All traffic denied by default."
-                send_alert "All traffic is now denied by default."
+                ufw_rule "default" "deny"
                 ;;
             "den-in")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-INCOMING}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw default deny incoming
-                log_message "INFO" "All incoming traffic denied by default."
-                send_alert "All incoming traffic is now denied by default."
+                ufw_rule "default" "deny incoming"
                 ;;
             "alw-out")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ALLOW-OUTGOING}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw default allow outgoing
-                log_message "INFO" "Outgoing traffic allowed by default."
-                send_alert "Outgoing traffic is now allowed by default."
+                ufw_rule "default" "allow outgoing"
                 ;;
             "den-out")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-OUTGOING}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw deny outgoing
-                log_message "INFO" "Outgoing traffic denied."
-                send_alert "Outgoing traffic has been denied."
+                ufw_rule "default" "deny outgoing"
                 ;;
             "aping")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ALLOW-PING}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow proto icmp
-                log_message "INFO" "Ping (ICMP) allowed through UFW."
-                send_alert "Ping has been allowed through UFW."
+                ufw_rule "allow" "proto icmp"
                 ;;
             "dping")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-PING}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw deny proto icmp
-                log_message "INFO" "Ping (ICMP) denied through UFW."
-                send_alert "Ping has been denied through UFW."
+                ufw_rule "deny" "proto icmp"
                 ;;
             "adns")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ALLOW-DNS}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow dns
-                log_message "INFO" "DNS allowed through UFW."
-                send_alert "DNS has been allowed through UFW."
+                ufw_rule "allow" "dns"
                 ;;
             "ddns")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-DNS}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow dns
-                log_message "INFO" "DNS Denied through UFW."
-                send_alert "DNS has been Denied through UFW."
+                ufw_rule "deny" "dns"
                 ;;
             "asmtp")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ALLOW-SMTP}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow smtp
-                log_message "INFO" "SMTP allowed through UFW."
-                send_alert "SMTP has been allowed through UFW."
+                ufw_rule "allow" "smtp"
                 ;;
             "dsmtp")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-SMTP}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw deny smtp
-                log_message "INFO" "SMTP denied through UFW."
-                send_alert "SMTP has been denied through UFW."
+                ufw_rule "deny" "smtp"
                 ;;
             "apop3")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ALLOW-POP3}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow pop3
-                log_message "INFO" "POP3 allowed through UFW."
-                send_alert "POP3 has been allowed through UFW."
+                ufw_rule "allow" "pop3"
                 ;;
             "dpop3")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-POP3}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw Deny pop3
-                log_message "INFO" "POP3 denied through UFW."
-                send_alert "POP3 has been denied through UFW."
+                ufw_rule "deny" "pop3"
                 ;;
             "aimap")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-ALLOW-IMAP}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw allow imap
-                log_message "INFO" "IMAP allowed through UFW."
-                send_alert "IMAP has been allowed through UFW."
+                ufw_rule "allow" "imap"
                 ;;
             "dimap")
-                echo -e "\033[1;32m"
-                echo "<<==={UFW-DENY-IMAP}===>>"
-                echo -e "\033[0m"  # Reset color
-                sudo ufw deny imap
-                log_message "INFO" "IMAP denied through UFW."
-                send_alert "IMAP has been denied through UFW."
+                ufw_rule "deny" "imap"
                 ;;
             "clear")
                 clear
@@ -733,7 +1588,7 @@ update_system() {
 
 update_from_github() {
     local repo="CYBER-4RMY/LINUX-DEFENDER"  # Exact GitHub repository (case-sensitive)
-    local current_version="v1.2"               # Your current version (update as needed)
+    local current_version="v1.3"               # Your current version (update as needed)
     local latest_version
     local zip_file
     local temp_dir
@@ -774,7 +1629,7 @@ update_from_github() {
     # Prepare download info
     temp_dir=$(mktemp -d) || { echo "Failed to create temp directory."; return 1; }
     zip_file="${repo##*/}-${latest_version}.zip"
-    url="https://github.com/${repo}/releases/download/${latest_version}/${zip_file}"
+    url="https://github.com/${repo}/archive/refs/tags/${latest_version}.zip"
 
     echo "Downloading $zip_file from $url..."
 
@@ -796,10 +1651,14 @@ update_from_github() {
 
     echo "Extraction completed."
 
-    # TODO: Replace this with actual move/copy logic for your project files
+    # Replace this with actual move/copy logic for your project files
     # e.g., mv "$temp_dir/extracted_folder/*" /your/project/directory/
     # Adjust this path according to your repo structure after extraction
-
+    
+    # Assuming the script is named defender.sh in the repo
+    
+    sudo cp "$temp_dir/LINUX-DEFENDER-${latest_version:1}/defender.sh" "$SCRIPT_PATH"
+    
     echo "Cleaning up temporary files..."
     rm -rf "$temp_dir"
 
