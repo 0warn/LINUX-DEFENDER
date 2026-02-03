@@ -13,7 +13,7 @@ INSTALL_PATH = "/usr/local/bin"
 arch_packages = [
     "tor", "chkrootkit", "clamav", "audit", "iptables",
     "ufw", "inotify-tools", "rkhunter", "inxi", "xterm", "curl", "unzip", "grep", "sort",
-    "logwatch", "postfix", "mailutils", "google-authenticator"
+    "logwatch", "postfix", "mailutils", "libpam-google-authenticator"
 ]
 
 debian_packages = [
