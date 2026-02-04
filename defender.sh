@@ -9,6 +9,7 @@
 
 # --- CONFIGURATION ---
 CONFIG_FILE="/etc/linux-defender/defender.conf"
+HISTORY_FILE="$HOME/.linux-defender_history"
 
 # Default values
 LOGFILE="/var/log/linux_defender.log"
@@ -16,8 +17,32 @@ SCAN_DIRS=("/home" "/etc" "/usr/bin" "/usr/sbin")
 BACKUP_DIR="/var/backups/linux_defender"
 QUARANTINE_DIR="/var/quarantine"
 EMAIL_ADDRESS="root@localhost"
+CHECKSUM_FILE="/var/lib/linux-defender/checksums.db"
 
 # --- FUNCTIONS ---
+
+get_distro() {
+    if [ -f "/etc/os-release" ]; then
+        . /etc/os-release
+        if [[ "$ID" == "arch" ]]; then
+            echo "arch"
+        elif [[ "$ID" == "garuda" ]]; then
+            echo "garuda"
+        elif [[ "$ID" == "kali" ]]; then
+            echo "kali"
+        elif [[ "$ID" == "parrot" ]]; then
+            echo "parrot"
+        elif [[ "$ID" == "debian" ]]; then
+            echo "debian"
+        elif [[ "$ID" == "ubuntu" ]]; then
+            echo "ubuntu"
+        else
+            echo "unknown"
+        fi
+    else
+        echo "unknown"
+    fi
+}
 
 load_config() {
     if [ -f "$CONFIG_FILE" ]; then
@@ -28,21 +53,7 @@ load_config() {
 }
 
 # ... (rest of the script)
-# Main function
-main() {
-    load_config
-    check_root
-    display_banner1
-    run_user_commands
-}
 
-# Run the main function
-main "$@"
-
-# Load history from file if it exists
-if [[ -f "$HISTORY_FILE" ]]; then
-    history -r "$HISTORY_FILE"
-fi
 
 # Function to check if the script is run as root
 check_root() {
@@ -69,116 +80,24 @@ log_message() {
 # Function to send alerts
 send_alert() {
     local message="$1"
-    echo "Sending alert: $message"  # Debugging line
+    echo "$message" | mail -s "Linux Defender Alert" "$EMAIL_ADDRESS"
 }
 
-# Function to display colorful welcome message
-display_welcome() {
+# Function to display a standardized welcome banner
+display_welcome_banner() {
+    local title="$1"
+    local border_char="="
+    local border_length=$((${#title} + 24))
+    local border=""
+    for ((i=0; i<$border_length; i++)); do
+        border+="$border_char"
+    done
+
     echo -e "\033[1;32m"  # Green color
-    echo "                       <<===============================>>"
-    echo "                         <<-WELCOME-TO-LINUX-DEFENDER->>"
-    echo "                       <<===============================>>"
+    echo "                       <<$border>>"
+    echo "                         <<-WELCOME-TO-$title->>"
+    echo "                       <<$border>>"
     echo "                             <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
-
-# Function to display colorful welcome message for ufw
-display_ufw_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<============================>>"
-    echo "                         <<-WELCOME-TO-UFW-MANAGER->>"
-    echo "                       <<============================>>"
-    echo "                            <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
-
-# Function to display colorful welcome message for supdate
-display_supdate_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<============================>>"
-    echo "                         <<-WELCOME-TO-SYS-UPDATER->>"
-    echo "                       <<============================>>"
-    echo "                            <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
-
-# Function to display colorful welcome message for scan
-display_scan_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<=============================>>"
-    echo "                         <<-WELCOME-TO-SCAN-MANAGER->>"
-    echo "                       <<=============================>>"
-    echo "                            <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
-
-# Function to display colorful welcome message for ai
-display_ai_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<========================================>>"
-    echo "                         <<-WELCOME-TO-ARTIFICIAL-INTELLIGENCE->>"
-    echo "                       <<========================================>>"
-    echo "                                   <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
-
-# Function to display colorful welcome message for traffic
-display_traffic_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<========================================>>"
-    echo "                         <<-WELCOME-TO-NETWORK-PIRVACY-MANAGER->>"
-    echo "                       <<========================================>>"
-    echo "                                   <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
-
-# Function to display colorful welcome message for backup
-display_backup_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<===============================>>"
-    echo "                         <<-WELCOME-TO-BACKUP-MANAGER->>"
-    echo "                       <<===============================>>"
-    echo "                             <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
-
-# Function to display colorful welcome message for css
-display_css_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<===================================>>"
-    echo "                         <<-WELCOME-TO-SYS-STATUS-MANAGER->>"
-    echo "                       <<===================================>>"
-    echo "                                <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
-
-# Function to display colorful welcome message for css
-display_cfi_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<=============================================>>"
-    echo "                         <<-WELCOME-TO-CHECK-FILE-INTEGRITY-MANAGER->>"
-    echo "                       <<=============================================>>"
-    echo "                                     <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
-
-# Function to display colorful welcome message for css
-display_report_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                   <<==================>>---=====---<<=================>>"
-    echo "                     <<-WELCOME-TO-LINUX-DEFENDER-REOPORT-GENERATOR->>"
-    echo "                   <<==================>>---=====---<<=================>>"
-    echo "                                    <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
-
-# Function to display colorful welcome message for system monitor
-display_monitor_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<====================================>>"
-    echo "                         <<-WELCOME-TO-SYS-MONITOR-SECTION->>"
-    echo "                       <<====================================>>"
-    echo "                               <<-=-CYBER-4RMY-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -340,7 +259,7 @@ run_user_commands() {
                 display_banner
                 ;;
             "welcome")
-                display_welcome
+                display_welcome_banner "LINUX-DEFENDER"
                 ;;
             "clear")
                 clear  # Clear the terminal
@@ -385,15 +304,7 @@ run_user_commands() {
     done
 }
 
-# Function to display colorful welcome message for reporting
-display_reporting_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<===============================>>"
-    echo "                         <<-WELCOME-TO-REPORTING-MANAGER->>"
-    echo "                       <<===============================>>"
-    echo "                             <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
+
 
 manage_reporting() {
     local current_section="REPORTING"
@@ -441,7 +352,7 @@ manage_reporting() {
                 echo -e "\033[0m"
                 ;;
             "banner")
-                display_reporting_welcome
+                display_welcome_banner "REPORTING-MANAGER"
                 ;;
             "clear")
                 clear
@@ -465,7 +376,7 @@ system_checkup() {
     local max_score=3
     local report_output=""
 
-    report_output+="--- System Security Check-up Report (${DATE}) ---\n"
+    report_output+="--- System Security Check-up Report ($(date)) ---\n"
 
     # Check 1: Firewall Status
     if sudo ufw status | grep -q "Status: active"; then
@@ -529,15 +440,7 @@ configure_email_notifications() {
 }
 
 
-# Function to display colorful welcome message for filesystem
-display_filesystem_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<===============================>>"
-    echo "                         <<-WELCOME-TO-FILESYSTEM-MANAGER->>"
-    echo "                       <<===============================>>"
-    echo "                             <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
+
 
 manage_filesystem() {
     local current_section="FILESYSTEM"
@@ -593,7 +496,7 @@ manage_filesystem() {
                 echo -e "\033[0m"
                 ;;
             "banner")
-                display_filesystem_welcome
+                display_welcome_banner "FILESYSTEM-MANAGER"
                 ;;
             "clear")
                 clear
@@ -677,15 +580,7 @@ configure_quarantine() {
 }
 
 
-# Function to display colorful welcome message for user
-display_user_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<===============================>>"
-    echo "                         <<-WELCOME-TO-USER-MANAGER->>"
-    echo "                       <<===============================>>"
-    echo "                             <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
+
 
 manage_user() {
     local current_section="USER"
@@ -733,7 +628,7 @@ manage_user() {
                 echo -e "\033[0m"
                 ;;
             "banner")
-                display_user_welcome
+                display_welcome_banner "USER-MANAGER"
                 ;;
             "clear")
                 clear
@@ -814,15 +709,7 @@ check_risky_users() {
 }
 
 
-# Function to display colorful welcome message for network
-display_network_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<===============================>>"
-    echo "                         <<-WELCOME-TO-NETWORK-MANAGER->>"
-    echo "                       <<===============================>>"
-    echo "                             <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
+
 
 manage_network() {
     local current_section="NETWORK"
@@ -882,7 +769,7 @@ manage_network() {
                 echo -e "\033[0m"
                 ;;
             "banner")
-                display_network_welcome
+                display_welcome_banner "NETWORK-MANAGER"
                 ;;
             "clear")
                 clear
@@ -968,15 +855,7 @@ EOF
 }
 
 
-# Function to display colorful welcome message for audit
-display_audit_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<===============================>>"
-    echo "                         <<-WELCOME-TO-AUDIT-MANAGER->>"
-    echo "                       <<===============================>>"
-    echo "                             <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
+
 
 manage_audit() {
     local current_section="AUDIT"
@@ -1024,7 +903,7 @@ manage_audit() {
                 echo -e "\033[0m"
                 ;;
             "banner")
-                display_audit_welcome
+                display_welcome_banner "AUDIT-MANAGER"
                 ;;
             "clear")
                 clear
@@ -1153,15 +1032,7 @@ EOF
 }
 
 
-# Function to display colorful welcome message for harden
-display_harden_welcome() {
-    echo -e "\033[1;32m"  # Green color
-    echo "                       <<===============================>>"
-    echo "                         <<-WELCOME-TO-HARDEN-MANAGER->>"
-    echo "                       <<===============================>>"
-    echo "                             <<-=-CYBER-4RMY-=->>       "
-    echo -e "\033[0m"  # Reset color
-}
+
 
 harden_system() {
     local current_section="HARDEN"
@@ -1192,6 +1063,15 @@ harden_system() {
             "usb-on")
                 disable_usb "off"
                 ;;
+            "perms")
+                check_permissions
+                ;;
+            "suidguid")
+                find_suid_guid
+                ;;
+            "apparmor")
+                check_apparmor
+                ;;
             "help")
                 echo -e "\033[1;32m" "\nAVAILABLE COMMANDS (AC):"
                 echo " 1. ls        - List available hardening options"
@@ -1210,10 +1090,13 @@ harden_system() {
                 echo " 2. kernel    - Apply kernel hardening settings"
                 echo " 3. usb-off   - Disable USB storage"
                 echo " 4. usb-on    - Enable USB storage"
+                echo " 5. perms     - Check and fix insecure file permissions"
+                echo " 6. suidguid  - Find and report SUID/GUID files"
+                echo " 7. apparmor  - Check AppArmor status"
                 echo -e "\033[0m"
                 ;;
             "banner")
-                display_harden_welcome
+                display_welcome_banner "HARDEN-MANAGER"
                 ;;
             "clear")
                 clear
@@ -1231,6 +1114,66 @@ harden_system() {
     done
 }
 
+check_permissions() {
+    echo "Checking for world-writable files and directories..."
+    local ww_files=$(find / -xdev -type f -perm -0002 2>/dev/null)
+    local ww_dirs=$(find / -xdev -type d -perm -0002 2>/dev/null)
+
+    if [[ -z "$ww_files" && -z "$ww_dirs" ]]; then
+        echo "No world-writable files or directories found."
+        log_message "INFO" "No world-writable files or directories found."
+        return
+    fi
+
+    echo "World-writable files:"
+    echo "$ww_files"
+    echo "World-writable directories:"
+    echo "$ww_dirs"
+
+    read -p "Do you want to fix these permissions? (y/n): " choice
+    if [[ "$choice" == "y" ]]; then
+        echo "Fixing permissions..."
+        if [[ -n "$ww_files" ]]; then
+            sudo chmod o-w $ww_files
+        fi
+        if [[ -n "$ww_dirs" ]]; then
+            sudo chmod o-w $ww_dirs
+        fi
+        log_message "INFO" "Fixed permissions for world-writable files and directories."
+        send_alert "Fixed permissions for world-writable files and directories."
+        echo "Permissions fixed."
+    fi
+}
+
+find_suid_guid() {
+    echo "Finding SUID/GUID files..."
+    local suid_files=$(find / -xdev -type f -perm -4000 2>/dev/null)
+    local guid_files=$(find / -xdev -type f -perm -2000 2>/dev/null)
+
+    if [[ -z "$suid_files" && -z "$guid_files" ]]; then
+        echo "No SUID/GUID files found."
+        log_message "INFO" "No SUID/GUID files found."
+        return
+    fi
+
+    echo "SUID files:"
+    echo "$suid_files"
+    echo "GUID files:"
+    echo "$guid_files"
+
+    log_message "INFO" "Found SUID/GUID files. See console output for details."
+}
+
+check_apparmor() {
+    echo "Checking AppArmor status..."
+    if command -v aa-status &> /dev/null; then
+        sudo aa-status
+    else
+        echo "AppArmor not found. It might not be installed or you are not on a system that uses AppArmor."
+        log_message "INFO" "AppArmor not found."
+    fi
+}
+
 harden_ssh() {
     echo "Hardening SSH..."
     # Backup sshd_config
@@ -1246,6 +1189,19 @@ harden_ssh() {
     # Disable password authentication
     sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
     sudo sed -i 's/PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+
+    # Further harden SSH
+    sudo tee -a /etc/ssh/sshd_config > /dev/null <<'EOF'
+
+# Harden SSH configuration
+X11Forwarding no
+LoginGraceTime 60
+ClientAliveInterval 300
+ClientAliveCountMax 0
+Ciphers aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-512,hmac-sha2-256
+KexAlgorithms diffie-hellman-group-exchange-sha256
+EOF
     
     sudo systemctl restart sshd
     log_message "INFO" "SSH hardening applied."
@@ -1255,11 +1211,49 @@ harden_ssh() {
 harden_kernel() {
     echo "Hardening kernel..."
     
-    # Enable ASLR
-    sudo echo "kernel.randomize_va_space = 2" > /etc/sysctl.d/99-hardening.conf
-    
-    # Hide kernel symbols
-    sudo echo "kernel.kptr_restrict = 2" >> /etc/sysctl.d/99-hardening.conf
+    sudo tee /etc/sysctl.d/99-hardening.conf > /dev/null <<'EOF'
+# Kernel hardening settings applied by Linux Defender
+
+# Enable ASLR
+kernel.randomize_va_space = 2
+
+# Hide kernel symbols
+kernel.kptr_restrict = 2
+
+# Disable IP forwarding
+net.ipv4.ip_forward = 0
+
+# Disable sending of ICMP redirects
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.send_redirects = 0
+
+# Disable source routing
+net.ipv4.conf.all.accept_source_route = 0
+net.ipv4.conf.default.accept_source_route = 0
+
+# Disable accepting of ICMP redirects
+net.ipv4.conf.all.accept_redirects = 0
+net.ipv4.conf.default.accept_redirects = 0
+net.ipv4.conf.all.secure_redirects = 0
+net.ipv4.conf.default.secure_redirects = 0
+
+# Log spoofed packets
+net.ipv4.conf.all.log_martians = 1
+net.ipv4.conf.default.log_martians = 1
+
+# Ignore ICMP broadcasts
+net.ipv4.icmp_echo_ignore_broadcasts = 1
+
+# Ignore bogus ICMP responses
+net.ipv4.icmp_ignore_bogus_error_responses = 1
+
+# Enable SYN cookies
+net.ipv4.tcp_syncookies = 1
+
+# Enable reverse path filtering
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+EOF
     
     # Apply settings
     sudo sysctl -p /etc/sysctl.d/99-hardening.conf
@@ -1421,7 +1415,7 @@ manage_firewall() {
                 clear
                 ;;
             "banner")
-                display_ufw_welcome
+                display_welcome_banner "UFW-MANAGER"
                 ;;
             "help")
                 echo -e "\033[1;32m" "\nUFW Help (UFWH):"
@@ -1507,27 +1501,30 @@ update_system() {
         case $option in
             "pdeb")
                 if sudo parrot-upgrade -y; then
-                    log_message "INFO" "PARROT OS updated successfully."
-                    send_alert "PARROT OS updated successfully."
+                    log_message "INFO" "Parrot OS updated successfully."
+                    send_alert "Parrot OS updated successfully."
                 else
-                    log_message "ERROR" "PARROT OS system update failed."
-                    send_alert "PARROT OS system update failed. Check the log for details."
+                    log_message "ERROR" "Parrot OS system update failed."
+                    send_alert "Parrot OS system update failed. Check the log for details."
                 fi
                 ;;
             "kdeb")
                 if sudo apt full-upgrade -y; then
-                    log_message "INFO" "KALI linux updated successfully."
-                    send_alert "KALI linux updated successfully."
+                    log_message "INFO" "Kali Linux updated successfully."
+                    send_alert "Kali Linux updated successfully."
                 else
-                    log_message "ERROR" "KALI linux system update failed."
-                    send_alert "KALI linux system update failed. Check the log for details."
+                    log_message "ERROR" "Kali Linux system update failed."
+                    send_alert "Kali Linux system update failed. Check the log for details."
                 fi
                 ;;
             "deb")
-                sudo apt-get update -y
-                sudo apt-get upgrade -y
-                log_message "INFO" "Ububtu/Debian Update Successfully."
-                send_alert "Your disro is updated successfully."
+                if sudo apt-get update -y && sudo apt-get upgrade -y; then
+                    log_message "INFO" "Ubuntu/Debian updated successfully."
+                    send_alert "Ubuntu/Debian updated successfully."
+                else
+                    log_message "ERROR" "Ubuntu/Debian system update failed."
+                    send_alert "Ubuntu/Debian system update failed. Check the log for details."
+                fi
                 ;;
             "arch")
                 if sudo pacman -Syyu --noconfirm; then
@@ -1562,7 +1559,7 @@ update_system() {
                 clear  # Clear the terminal
                 ;;
             "banner")
-                display_supdate_welcome
+                display_welcome_banner "SYS-UPDATER"
                 ;;
             "ls")
                 echo -e "\033[1;32m" "\nCOOSE YOUR DISTRO TYPE (CYDT):"
@@ -1594,9 +1591,10 @@ update_from_github() {
     local temp_dir
     local url
     local http_status
+    local new_script_path
 
     # Check for required commands
-    for cmd in curl unzip grep sort; do
+    for cmd in curl unzip grep sort find; do
         if ! command -v "$cmd" &> /dev/null; then
             echo "Error: $cmd is not installed. Please install it and try again."
             return 1
@@ -1651,25 +1649,29 @@ update_from_github() {
 
     echo "Extraction completed."
 
-    # Replace this with actual move/copy logic for your project files
-    # e.g., mv "$temp_dir/extracted_folder/*" /your/project/directory/
-    # Adjust this path according to your repo structure after extraction
+    # Find the new script file in the extracted directory
+    new_script_path=$(find "$temp_dir" -name "defender.sh" -type f | head -n 1)
+
+    if [[ -z "$new_script_path" ]]; then
+        echo "Error: Could not find 'defender.sh' in the downloaded files."
+        rm -rf "$temp_dir"
+        return 1
+    fi
     
-    # Assuming the script is named defender.sh in the repo
-    
-    sudo cp "$temp_dir/LINUX-DEFENDER-${latest_version:1}/defender.sh" "$SCRIPT_PATH"
+    # Replace the old script with the new one
+    sudo cp "$new_script_path" "$SCRIPT_PATH"
     
     echo "Cleaning up temporary files..."
     rm -rf "$temp_dir"
 
     echo "Update completed successfully."
-    return 0
+    echo "Please restart the script for the changes to take effect."
+    exit 0
 }
 
 # Function to scan for malware using multiple tools
 scan_for_danger() {
     local current_section="SCAN"
-    local scan_pid=0
 
     # Load history from file if it exists
     if [[ -f "$HISTORY_FILE" ]]; then
@@ -1695,45 +1697,41 @@ scan_for_danger() {
         case $option in
             "clam")
                 log_message "INFO" "Scanning for malware with ClamAV..."
+                local all_scans_passed=true
                 for dir in "${SCAN_DIRS[@]}"; do
-                    clamscan -r "$dir" | tee -a $LOGFILE &
-                    scan_pid=$!  # Store the PID of the background process
-                    wait "$scan_pid"  # Wait for the scan to complete
-                    if [[ $? -ne 0 ]]; then
+                    if ! clamscan -r "$dir" | tee -a $LOGFILE; then
                         log_message "WARNING" "Malware detected in $dir with ClamAV!"
                         send_alert "Malware detected in $dir with ClamAV! Check the log for details."
+                        all_scans_passed=false
                     fi
                 done
-                send_alert "ClamAV scan completed."
-                scan_pid=0  # Reset PID after completion
+                if $all_scans_passed; then
+                    log_message "INFO" "ClamAV scan completed. No issues found."
+                    send_alert "ClamAV scan completed. No issues found."
+                else
+                    log_message "WARNING" "ClamAV scan completed. Issues found!"
+                    send_alert "ClamAV scan completed. Issues found! Check the log for details."
+                fi
                 ;;
             "rkit")
                 log_message "INFO" "Checking for rootkits using rkhunter..."
-                sudo rkhunter --check | tee -a $LOGFILE &
-                scan_pid=$!  # Store the PID of the background process
-                wait "$scan_pid"  # Wait for the scan to complete
-                if [[ $? -eq 0 ]]; then
-                    send_alert "Rootkit check completed. No issues found."
-                    log_message "INFO" "Rootkit check completed. No issues found."
+                if sudo rkhunter --check | tee -a $LOGFILE; then
+                    log_message "INFO" "Rootkit check with rkhunter completed. No issues found."
+                    send_alert "Rootkit check with rkhunter completed. No issues found."
                 else
-                    send_alert "Rootkit check completed. Issues found! Check the log for details."
-                    log_message "WARNING" "Rootkit check completed. Issues found!"
+                    log_message "WARNING" "Rootkit check with rkhunter completed. Issues found!"
+                    send_alert "Rootkit check with rkhunter completed. Issues found! Check the log for details."
                 fi
-                scan_pid=0  # Reset PID after completion
                 ;;
             "crkit")
-                log_message "INFO" "Checking for rootkits using chrootkit..."
-                sudo chkrootkit | tee -a $LOGFILE &
-                scan_pid=$!  # Store the PID of the background process
-                wait "$scan_pid"  # Wait for the scan to complete
-                if [[ $? -eq 0 ]]; then
-                    send_alert "Rootkit check completed. No issues found."
-                    log_message "INFO" "Rootkit check completed. No issues found."
+                log_message "INFO" "Checking for rootkits using chkrootkit..."
+                if sudo chkrootkit | tee -a $LOGFILE; then
+                    log_message "INFO" "Rootkit check with chkrootkit completed. No issues found."
+                    send_alert "Rootkit check with chkrootkit completed. No issues found."
                 else
-                    send_alert "Rootkit check completed. Issues found! Check the log for details."
-                    log_message "WARNING" "Rootkit check completed. Issues found!"
+                    log_message "WARNING" "Rootkit check with chkrootkit completed. Issues found!"
+                    send_alert "Rootkit check with chkrootkit completed. Issues found! Check the log for details."
                 fi
-                scan_pid=0  # Reset PID after completion
                 ;;
             "help")
                 echo -e "\033[1;32m" "\nSCAN HELP (SCANH):"
@@ -1756,7 +1754,7 @@ scan_for_danger() {
                 echo -e "\033[0m"  # Reset color
                 ;;
             "banner")
-                display_scan_welcome
+                display_welcome_banner "SCAN-MANAGER"
                 ;;
             "clear")
                 clear  # Clear the terminal
@@ -1954,7 +1952,7 @@ chat_ai() {
                 echo -e "\033[0m"  # Reset color
                 ;;
             "banner")
-                display_ai_welcome
+                display_welcome_banner "ARTIFICIAL-INTELLIGENCE"
                 ;;
             "clear")
                 clear  # Clear the terminal
@@ -2105,7 +2103,7 @@ traffic_anony() {
                 echo -e "\033[0m"  # Reset color
                 ;;
             "banner")
-                display_traffic_welcome
+                display_welcome_banner "NETWORK-PRIVACY-MANAGER"
                 ;;
             "clear")
                 clear  # Clear the terminal
@@ -2126,9 +2124,7 @@ traffic_anony() {
 # Function to backup critical files
 backup_files() {
     local current_section="BACKUP"
-    local BACKUP_DIR="$HOME/normal_backup"  # Default backup directory
-    local SCAN_DIRS=()
-
+    
     # Load history from file if it exists
     if [[ -f "$HISTORY_FILE" ]]; then
         history -r "$HISTORY_FILE"
@@ -2152,8 +2148,13 @@ backup_files() {
 
         case $option in
             "custsf")
-                read -p "> Specify backup storage path: " BACKUP_DIR
-                echo "-> You have chosen to back up to: $BACKUP_DIR"
+                local backup_dir="$HOME/normal_backup"
+                local scan_dirs=()
+                read -p "> Specify backup storage path (default: $backup_dir): " custom_backup_dir
+                if [[ -n "$custom_backup_dir" ]]; then
+                    backup_dir="$custom_backup_dir"
+                fi
+                echo "-> You have chosen to back up to: $backup_dir"
                 echo "==> Specify folders to backup (type 'done' when finished):"
                 while true; do
                     read -p "=> Folder: " dir
@@ -2161,11 +2162,27 @@ backup_files() {
                         break
                     fi
                     if [[ -d "$dir" ]]; then
-                        SCAN_DIRS+=("$dir")
+                        scan_dirs+=("$dir")
                     else
                         echo "-> Directory does not exist. Please enter a valid folder."
                     fi
                 done
+
+                if [[ ${#scan_dirs[@]} -gt 0 ]]; then
+                    mkdir -p "$backup_dir"
+                    local timestamp=$(date '+%Y%m%d-%H%M%S')
+                    local backup_file="$backup_dir/backup-$timestamp.tar.gz"
+                    log_message "INFO" "> Backing up files to $backup_file..."
+                    if sudo tar -czf "$backup_file" "${scan_dirs[@]}"; then
+                        log_message "INFO" "Successfully created backup: $backup_file"
+                        send_alert "Backup created successfully: $backup_file"
+                        echo "=> Backup file created at: $backup_file"
+                    else
+                        log_message "ERROR" "Failed to create backup. Check the log for details."
+                        send_alert "Failed to create backup. Check the log for details."
+                        echo "-> Failed to create backup. Check the log for details."
+                    fi
+                fi
                 ;;
             "help")
                 echo -e "\033[1;32m" "\nBACKUP HELP (BACKH):"
@@ -2186,7 +2203,7 @@ backup_files() {
                 clear  # Clear the terminal
                 ;;
             "banner")
-                display_backup_welcome
+                display_welcome_banner "BACKUP-MANAGER"
                 ;;
             "cd ..")
                 return  # Exit the backup management section and go back to the main menu
@@ -2195,27 +2212,6 @@ backup_files() {
                 echo "-->> Invalid Command. Please use help to see the commands."
                 ;;
         esac
-
-        # Check if the user has specified folders to back up
-        if [[ ${#SCAN_DIRS[@]} -gt 0 ]]; then
-            # Create the backup directory if it doesn't exist
-            mkdir -p "$BACKUP_DIR"
-
-            # Perform the backup
-            log_message "INFO" "> Backing up files to $BACKUP_DIR..."
-            for dir in "${SCAN_DIRS[@]}"; do
-                cp -r "$dir" "$BACKUP_DIR" >> $LOGFILE 2>&1
-                if [[ $? -eq 0 ]]; then
-                    log_message "INFO" "Successfully backed up $dir to $BACKUP_DIR."
-                    echo "=> Successfully backed up $dir to $BACKUP_DIR."
-                else
-                    log_message "ERROR" "Failed to back up $dir. Check the log for details."
-                    echo "-> Failed to back up $dir. Check the log for details."
-                fi
-            done
-            send_alert "==>> Backup completed."
-            echo "=> Backup files are kept at: $BACKUP_DIR"
-        fi
 
         # Save history to file
         history -a "$HISTORY_FILE"
@@ -2388,7 +2384,7 @@ check_sys_status() {
                 echo -e "\033[0m"  # Reset color
                 ;;
             "banner")
-                display_css_welcome
+                display_welcome_banner "SYS-STATUS-MANAGER"
                 ;;
             "clear")
                 clear  # Clear the terminal
@@ -2555,7 +2551,7 @@ generate_report() {
                 clear  # Clear the terminal
                 ;;
             "banner")
-                display_report_welcome
+                display_welcome_banner "LINUX-DEFENDER-REPORT-GENERATOR"
                 ;;
             *)
                 echo "-->> Invalid Command. Please use help to see the commands."
@@ -2570,6 +2566,12 @@ generate_report() {
 # Function to check file integrity for security reason
 check_integrity() {
     local current_section="CFI"
+    local checksum_dir=$(dirname "$CHECKSUM_FILE")
+
+    # Create the directory for the checksum file if it doesn't exist
+    if [[ ! -d "$checksum_dir" ]]; then
+        sudo mkdir -p "$checksum_dir"
+    fi
 
     # Load history from file if it exists
     if [[ -f "$HISTORY_FILE" ]]; then
@@ -2593,77 +2595,50 @@ check_integrity() {
         history -s "$option"
 
         case $option in
-            "cfiv")
+            "cfiv" | "cfin")
                 echo -e "\033[1;32m"
-                echo "                                  <<============>>---====---<<=============>>"
-                echo "                                           <<--CFI-IN-VERBOSE-WAY-->>"
-                echo "                                  <<============>>---====---<<=============>>"
-                echo -e "\033[0m"  # Reset color
-                log_message "INFO" "Checking file integrity in Verbose way."
-
-                # Create a temporary file to capture output
-                TEMP_OUTPUT=$(mktemp)
-
-                # Open xterm and run the commands inside it
-                xterm -hold -e bash -c "
-                    echo 'INFO: Checking file integrity...'
-
-                    if [[ ! -f $CHECKSUM_FILE ]]; then
-                        echo 'INFO: Creating checksum file...'
-                        find \"\${SCAN_DIRS[@]}\" -type f -exec sha256sum {} \\; > \"$CHECKSUM_FILE\"
-                        send_alert 'Checksum file created.'
-                    else
-                        echo 'INFO: Verifying checksums...'
-                        # Capture the output of sha256sum and save to temporary file
-                        sha256sum -c \"$CHECKSUM_FILE\" 2>&1 | tee \"$TEMP_OUTPUT\"
-                        if [[ \${PIPESTATUS[0]} -eq 0 ]]; then
-                            send_alert 'File integrity check passed. All files are intact.'
-                            echo 'INFO: File integrity check passed. All files are intact.'
-                        else
-                            send_alert 'File integrity check failed! Some files have been modified.'
-                            echo 'WARNING: File integrity check failed! Some files have been modified.'
-                        fi
-                    fi
-                " &
-
-                # Wait for xterm to finish
-                wait
-
-                # Display mismatched files in the main terminal
-                if [[ -f "$TEMP_OUTPUT" ]]; then
-                    echo "Mismatched files:"
-                    grep 'FAILED' "$TEMP_OUTPUT" | while IFS= read -r line; do
-                        # Extract the filename from the line
-                        filename=$(echo "$line" | awk '{print $1}')
-                        echo -e "\e[31m$filename\e[0m"  # Display the filename in red
-                    done
-                fi
-
-                # Clean up the temporary file
-                rm "$TEMP_OUTPUT"
-                ;;
-            "cfin")
-                    echo -e "\033[1;32m"
+                if [[ "$option" == "cfiv" ]]; then
+                    echo "                                  <<============>>---====---<<=============>>"
+                    echo "                                           <<--CFI-IN-VERBOSE-WAY-->>"
+                    echo "                                  <<============>>---====---<<=============>>"
+                else
                     echo "                                      <<============>>---====---<<=============>>"
                     echo "                                               <<--CFI-IN-NORMAL-WAY-->>"
                     echo "                                      <<============>>---====---<<=============>>"
-                    echo -e "\033[0m"  # Reset color
-                    log_message "INFO" "Checking file integrity normal way."
-                    if [[ ! -f $CHECKSUM_FILE ]]; then
-                        log_message "INFO" "Creating checksum file..."
-                        find "${SCAN_DIRS[@]}" -type f -exec sha256sum {} \; > $CHECKSUM_FILE
-                        send_alert "Checksum file created."
+                fi
+                echo -e "\033[0m"  # Reset color
+                log_message "INFO" "Checking file integrity..."
+
+                if [[ ! -f $CHECKSUM_FILE ]]; then
+                    log_message "INFO" "Creating checksum file..."
+                    sudo find "${SCAN_DIRS[@]}" -type f -exec sha256sum {} \; > "$CHECKSUM_FILE"
+                    sudo chattr +i "$CHECKSUM_FILE"
+                    send_alert "Checksum file created and made immutable."
+                    log_message "INFO" "Checksum file created and made immutable."
+                else
+                    log_message "INFO" "Verifying checksums..."
+                    sudo chattr -i "$CHECKSUM_FILE" # Make file mutable for verification
+                    local failed_files=$(sha256sum -c "$CHECKSUM_FILE" 2>&1 | grep 'FAILED')
+                    
+                    if [[ -z "$failed_files" ]]; then
+                        send_alert "File integrity check passed. All files are intact."
+                        log_message "INFO" "File integrity check passed. All files are intact."
+                        echo "File integrity check passed. All files are intact."
                     else
-                        log_message "INFO" "Verifying checksums..."
-                        if sha256sum -c $CHECKSUM_FILE; then
-                            send_alert "File integrity check passed. All files are intact."
-                            log_message "INFO" "File integrity check passed. All files are intact."
+                        send_alert "File integrity check failed! Some files have been modified."
+                        log_message "WARNING" "File integrity check failed! Some files have been modified."
+                        echo -e "\033[1;31mFile integrity check failed! Some files have been modified:\033[0m"
+                        if [[ "$option" == "cfiv" ]]; then
+                            echo "$failed_files" | while IFS= read -r line; do
+                                echo -e "\033[1;31m$line\033[0m"
+                            done
                         else
-                            send_alert "File integrity check failed! Some files have been modified."
-                            log_message "WARNING" "File integrity check failed! Some files have been modified."
+                            echo "$failed_files" | awk -F': ' '{print $1}'
                         fi
                     fi
-                    ;;
+                    sudo chattr +i "$CHECKSUM_FILE" # Make file immutable again
+                fi
+                ;;
             "ls")
                 echo -e "\033[1;32m" "\nCHECK FILE INTEGRITY COMMANDS (CFIC):"
                 echo " 1. cfin   - Check File Integrity in normal way. (WITHOUT_COLOR)"
@@ -2688,7 +2663,7 @@ check_integrity() {
                 clear  # Clear the terminal
                 ;;
             "banner")
-                display_cfi_welcome
+                display_welcome_banner "CHECK-FILE-INTEGRITY-MANAGER"
                 ;;
             *)
                 echo "-->> Invalid Command. Please use help to see the commands."
@@ -2810,7 +2785,7 @@ monitor_files() {
                 return  # Exit the monitoring section and go back to the main menu
                 ;;
             "banner")
-                display_monitor_welcome
+                display_welcome_banner "SYS-MONITOR-SECTION"
                 ;;
             *)
                 echo -e "\033[1;32m"
