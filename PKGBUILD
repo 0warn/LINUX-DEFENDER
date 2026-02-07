@@ -1,10 +1,10 @@
-# Maintainer: CYBER-4RMY <root@localhost>
+# Maintainer: 0warn <root@localhost>
 pkgname=linux-defender
 pkgver=1.3
 pkgrel=1
 pkgdesc="Harden your Linux system with one script — efficient, practical, and secure."
 arch=('any')
-url="https://github.com/CYBER-4RMY/LINUX-DEFENDER"
+url="https://github.com/0warn/LINUX-DEFENDER"
 license=('MIT')
 depends=(
     'tor'

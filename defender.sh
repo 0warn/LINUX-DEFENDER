@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#GITHUB => 'https://github.com/CYBER-4RMY'
+#GITHUB => 'https://github.com/0warn'
 #FOR any type of issue or any new suggestion give me a dm on TELEGRAM or INSTAGRAM
 #also YOU can use GITHUB
 #Feel free to send new suggetion and security tools to include in this script
@@ -97,7 +97,7 @@ display_welcome_banner() {
     echo "                       <<$border>>"
     echo "                         <<-WELCOME-TO-$title->>"
     echo "                       <<$border>>"
-    echo "                             <<-=-CYBER-4RMY-=->>       "
+    echo "                             <<-=-0warn-=->>       "
     echo -e "\033[0m"  # Reset color
 }
 
@@ -110,8 +110,8 @@ display_banner1() {
     echo "                                             ╚════██║██╔══╝  ██║     ██║   ██║██╔══██╗██╔══╝╚════╝╚════██║  ╚██╔╝  ╚════██║"
     echo "                                             ███████║███████╗╚██████╗╚██████╔╝██║  ██║███████╗    ███████║   ██║   ███████║"
     echo "                                             ╚══════╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝    ╚══════╝   ╚═╝   ╚══════╝"
-    echo "                                             <<==========================>>{CYBER-4RMY}<<==============================>>"
-    echo "                                                     <<==========={https://github.com/CYBER-4RMY}===========>>"
+    echo "                                             <<==========================>>{0warn}<<==============================>>"
+    echo "                                                     <<==========={https://github.com/0warn}===========>>"
     echo "                                                             <<=======================================>> "
     echo -e "\033[0m"  # Reset color
 }
@@ -126,7 +126,7 @@ display_banner(){
     echo "                                ██║     ██║██║╚██╗██║██║   ██║ ██╔██╗╚════╝██║  ██║██╔══╝  ██╔══╝  ██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗"
     echo "                                ███████╗██║██║ ╚████║╚██████╔╝██╔╝ ██╗     ██████╔╝███████╗██║     ███████╗██║ ╚████║██████╔╝███████╗██║  ██║"
     echo "                                ╚══════╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝     ╚═════╝ ╚══════╝╚═╝     ╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝"
-    echo "                         <<))================================================={CYBER-4RMY}====================================================((>>"
+    echo "                         <<))================================================={0warn}====================================================((>>"
     echo -e "\033[0m"
 }
 
@@ -1584,7 +1584,7 @@ update_system() {
 }
 
 update_from_github() {
-    local repo="CYBER-4RMY/LINUX-DEFENDER"  # Exact GitHub repository (case-sensitive)
+    local repo="0warn/LINUX-DEFENDER"  # Exact GitHub repository (case-sensitive)
     local current_version="v1.3"               # Your current version (update as needed)
     local latest_version
     local zip_file

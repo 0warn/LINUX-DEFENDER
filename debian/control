@@ -1,10 +1,10 @@
 Source: linux-defender
 Section: utils
 Priority: optional
-Maintainer: CYBER-4RMY <root@localhost>
+Maintainer: 0warn <root@localhost>
 Build-Depends: debhelper-compat (= 13)
 Standards-Version: 4.6.0
-Homepage: https://github.com/CYBER-4RMY/LINUX-DEFENDER
+Homepage: https://github.com/0warn/LINUX-DEFENDER
 
 Package: linux-defender
 Architecture: all

@@ -1,7 +1,7 @@
 # 🛡️ Linux-Defender.sh
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![GitHub stars](https://img.shields.io/github/stars/CYBER-4RMY/LINUX-DEFENDER.svg?style=social)
-![GitHub forks](https://img.shields.io/github/forks/CYBER-4RMY/LINUX-DEFENDER.svg?style=social)
+![GitHub stars](https://img.shields.io/github/stars/0warn/LINUX-DEFENDER.svg?style=social)
+![GitHub forks](https://img.shields.io/github/forks/0warn/LINUX-DEFENDER.svg?style=social)
 
 
 
@@ -85,7 +85,7 @@ Linux Defender offers flexible installation methods to suit your preferences. It
 This method involves cloning the repository and running the `setup.py` script, which automates dependency installation and sets up the `linux-defender` command system-wide.
 
 ```bash
-git clone https://github.com/CYBER-4RMY/LINUX-DEFENDER.git
+git clone https://github.com/0warn/LINUX-DEFENDER.git
 cd LINUX-DEFENDER
 sudo python3 ./setup.py
 ```
@@ -121,7 +121,7 @@ To install on Arch Linux, use `makepkg` to build and install the package from th
     `sudo pacman -S --needed git base-devel`
 
 2.  **Clone the repository:**
-    `git clone https://github.com/CYBER-4RMY/LINUX-DEFENDER.git`
+    `git clone https://github.com/0warn/LINUX-DEFENDER.git`
     `cd LINUX-DEFENDER`
 
 3.  **Build and install the package:**
@@ -148,7 +148,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## 🙋‍♂️ Author
 
-Built with care and cybersecurity principles by [CYBER-4RMY](https://github.com/CYBER-4RMY)
+Built with care and cybersecurity principles by [0warn](https://github.com/0warn)
 *“Secure it before someone else exploits it.”*
 
 ---

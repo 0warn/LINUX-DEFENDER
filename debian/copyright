@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: LINUX-DEFENDER
-Upstream-Contact: CYBER-4RMY <root@localhost>
-Source: https://github.com/CYBER-4RMY/LINUX-DEFENDER
+Upstream-Contact: 0warn <root@localhost>
+Source: https://github.com/0warn/LINUX-DEFENDER
 
 Files: *
 Copyright: 2025 CYBER MRINAL
